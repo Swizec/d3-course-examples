@@ -26,10 +26,12 @@
         slice.append("path")
             .attr({d: arc,
                    fill: function (d, i) { return colors(i); },
-                   "data-toggle": "tooltip",
-                   "title": function (d) { return d.data.label; }
+                   title: function (d) { return d.data.label; }
                   });
 
-        
+        $("svg path").tooltip({
+            container: "body",
+            placement: "right"
+        });
     });
 })();
