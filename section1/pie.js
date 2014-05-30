@@ -30,15 +30,16 @@
     };
 
     var manually = function (data, x, y) {
+        data = data.sort(function (a, b) {
+            return d3.descending(a.value, b.value);
+        });
+
         var colors = d3.scale.category20c(),
             total = d3.sum(data.map(function (d) { return d.value; })),
             offset = function (d, i) {
-                if (i > 0) {
-                    return d3.sum(data.slice(0, i).map(function (d) { 
-                        return 2*Math.PI*(d.value/total); 
-                    }));
-                }
-                return 0;
+                return d3.sum(data.slice(0, i).map(function (d) { 
+                    return 2*Math.PI*(d.value/total); 
+                }));
             },
             arc = d3.svg.arc()
                 .outerRadius(150)
