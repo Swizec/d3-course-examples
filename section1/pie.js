@@ -4,8 +4,8 @@
     var svg = d3.select("#graph")
             .append("svg")
             .style({
-                width: 1024,
-                height: 1024
+                width: "100%",
+                height: 500
             });
 
     var using_layout = function (data, x, y) {
@@ -14,8 +14,6 @@
                 .value(function (d) { return d.value; }),
             arc = d3.svg.arc()
                 .outerRadius(150),
-                //.startAngle(function (d) { return d.startAngle; })
-                //.endAngle(function (d) { return d.endAngle; }),
             slice = svg.selectAll('.slice')
                 .data(pie(data))
                 .enter()
@@ -61,8 +59,8 @@
     };
 
     d3.json("ufo-types.json", function (data) {
-        using_layout(data, 300, 400);
-        manually(data, 700, 400);
+        using_layout(data, 300, 250);
+        manually(data, 700, 250);
 
         $("svg path").tooltip({
             container: "body",
