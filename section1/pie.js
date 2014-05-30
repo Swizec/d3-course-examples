@@ -33,15 +33,17 @@
         var colors = d3.scale.category20c(),
             total = d3.sum(data.map(function (d) { return d.value; })),
             offset = function (d, i) {
-                 if (i > 0) {
-                     return d3.sum(data.slice(0, i-1).map(function (d) { return 2*Math.PI*(d.value/total); }));
-                 }
+                if (i > 0) {
+                    return d3.sum(data.slice(0, i).map(function (d) { 
+                        return 2*Math.PI*(d.value/total); 
+                    }));
+                }
                 return 0;
             },
             arc = d3.svg.arc()
                 .outerRadius(150)
                 .startAngle(offset)
-                .endAngle(function (d, i) {                    
+                .endAngle(function (d, i) {
                     return offset(d, i)+2*Math.PI*(d.value/total);
                 }),
             slice = svg.selectAll('.slice')
