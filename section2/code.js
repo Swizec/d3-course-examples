@@ -18,6 +18,23 @@
         });
     };
 
+    var using_layout = function (data, x, y) {
+        var colors = d3.scale.category20c(),
+            //pie = d3.layout.pie()
+            //    .value(function (d) { return d.value; }),
+            arc = d3.svg.arc(),
+            slice = svg.selectAll('.slice')
+                .data(data)
+                .enter()
+                .append("g")
+                .attr("transform", "translate("+x+", "+y+")");
+
+        slice.append("path")
+            .attr({d: arc,
+                   fill: function (d, i) { return colors(i); }
+                  });
+    };
+
     d3.json("triangle-ufos.json", function (data) {
         data = parse_times(data);
         
@@ -43,7 +60,7 @@
             return d;
         });
 
-        console.log(binned);
+        using_layout(binned, 300, 200);
     });
 
 })();
