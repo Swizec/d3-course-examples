@@ -26,8 +26,24 @@
                     return d.time.getHours();
                 })
                 .bins(24);
+        
+        var binned = histogram(data);
 
-        console.log(histogram(data));
+        var radians = d3.scale.linear()
+                .domain([0, d3.max(binned.map(function (d) { return d.x; }))])
+                .range([0, 2*Math.PI]),
+            innerRadius = 20;
+
+        binned = binned.map(function (d) {
+            d.innerRadius = innerRadius;
+            d.outerRadius = d.innerRadius+d.y;
+            d.startAngle = radians(d.x)-radians(d.dx/2);
+            d.endAngle = radians(d.x)+radians(d.dx/2);
+
+            return d;
+        });
+
+        console.log(binned);
     });
 
 })();
