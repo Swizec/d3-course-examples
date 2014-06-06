@@ -40,7 +40,9 @@
                 .value(function (d) {
                     return d.time.getHours();
                 })
-                .bins(24);
+                .bins(24)
+                .innerRadius(function () { return 20; })
+                .maxRadius(600);
         
         using_layout(histogram(data), 500, 800);
     });
