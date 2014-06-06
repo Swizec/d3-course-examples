@@ -42,9 +42,10 @@
                 })
                 .bins(24)
                 .innerRadius(function () { return 20; })
-                .maxRadius(600);
+                //.maxHeight(500);
+                .maxHeight(d3.scale.log().range([0, 300]));
         
-        using_layout(histogram(data), 500, 800);
+        using_layout(histogram(data), 500, 600);
     });
 
 })();
