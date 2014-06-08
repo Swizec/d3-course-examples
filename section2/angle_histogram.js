@@ -2,7 +2,8 @@
 d3.layout.angle_histogram = function () {
     var histogram = d3.layout.histogram(),
         innerRadius = 0,
-        maxHeight = d3.scale.linear();
+        maxHeight = d3.scale.linear(),
+        minHeight = 0;
 
     function angle_histogram (data, i) {
         var bins = histogram.call(this, data, i),
@@ -20,7 +21,10 @@ d3.layout.angle_histogram = function () {
             return d;
         });
 
-        maxHeight.domain([d3.min(bins.map(function (d) { return d.y; })),
+        maxHeight.domain([typeof minHeight === 'function' ?
+                          minHeight(d3.min(bins.map(
+                              function (d) { return d.y; }))) 
+                          : minHeight,
                           d3.max(bins.map(function (d) { return d.y; }))]);
 
         bins = bins.map(function (d) {
@@ -45,7 +49,7 @@ d3.layout.angle_histogram = function () {
         return angle_histogram;
     };
     
-    angle_histogram.maxHeight = function (x, scale) {
+    angle_histogram.maxHeight = function (x) {
         if (!arguments.length) return maxHeight;
 
         if (typeof x === 'function') {
@@ -54,6 +58,12 @@ d3.layout.angle_histogram = function () {
             maxHeight.range([0, x]);
         }
 
+        return angle_histogram;
+    };
+
+    angle_histogram.minHeight = function (x) {
+        if (!arguments.length) return innerRadius;
+        minHeight = x;
         return angle_histogram;
     };
 
