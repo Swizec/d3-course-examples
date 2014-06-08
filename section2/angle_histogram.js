@@ -17,12 +17,13 @@ d3.layout.angle_histogram = function () {
                 : endAngle,
             radians = d3.scale.ordinal()
                 .domain(bins.map(function (d) { return d.x; }))
-                .rangeBands([_startAngle, _endAngle], 0, .5);
+                .rangeBands([_startAngle, _endAngle], 0, 0);
 
         bins = bins.map(function (d, i) {
             d.innerRadius = typeof innerRadius === 'function' ?     
                 innerRadius(d, i) : innerRadius;
 
+            d.value = histogram.value()(d[0]);
             d.startAngle = radians(d.x)-radians.rangeBand()/2;
             d.endAngle = radians(d.x)+radians.rangeBand()/2;
 

@@ -43,9 +43,7 @@
                 .bins(24)
                 .innerRadius(function () { return 20; })
                 .maxHeight(d3.scale.log().range([0, 400]))
-                .minHeight(function (min_val) { return min_val/2; })
-                .startAngle(0)
-                .endAngle(Math.PI);
+                .minHeight(function (min_val) { return min_val/2; });
         
         using_layout(histogram(data), 500, 600);
     });
