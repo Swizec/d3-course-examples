@@ -3,28 +3,35 @@ d3.layout.angle_histogram = function () {
     var histogram = d3.layout.histogram(),
         innerRadius = 0,
         maxHeight = d3.scale.linear(),
-        minHeight = 0;
+        minHeight = 0,
+        startAngle = 0,
+        endAngle = 2*Math.PI;
 
     function angle_histogram (data, i) {
         var bins = histogram.call(this, data, i),
-            radians = d3.scale.linear()
-                .domain([0, d3.max(bins.map(function (d) { return d.x; }))])
-                .range([0, 2*Math.PI]);
+            _startAngle = typeof startAngle === 'function'
+                ? startAngle.apply(this, arguments)
+                : startAngle,
+            _endAngle = typeof startAngle === 'function'
+                ? endAngle.apply(this, arguments)
+                : endAngle,
+            radians = d3.scale.ordinal()
+                .domain(bins.map(function (d) { return d.x; }))
+                .rangeBands([_startAngle, _endAngle], 0, .5);
 
         bins = bins.map(function (d, i) {
             d.innerRadius = typeof innerRadius === 'function' ?     
                 innerRadius(d, i) : innerRadius;
-            
-            d.startAngle = radians(d.x)-radians(d.dx/2);
-            d.endAngle = radians(d.x)+radians(d.dx/2);
+
+            d.startAngle = radians(d.x)-radians.rangeBand()/2;
+            d.endAngle = radians(d.x)+radians.rangeBand()/2;
 
             return d;
         });
 
-        maxHeight.domain([typeof minHeight === 'function' ?
-                          minHeight(d3.min(bins.map(
-                              function (d) { return d.y; }))) 
-                          : minHeight,
+        maxHeight.domain([typeof minHeight === 'function'
+                            ? minHeight(d3.min(bins.map(function (d) { return d.y; }))) 
+                            : minHeight,
                           d3.max(bins.map(function (d) { return d.y; }))]);
 
         bins = bins.map(function (d) {
@@ -64,6 +71,18 @@ d3.layout.angle_histogram = function () {
     angle_histogram.minHeight = function (x) {
         if (!arguments.length) return innerRadius;
         minHeight = x;
+        return angle_histogram;
+    };
+
+    angle_histogram.startAngle = function (x) {
+        if (!arguments.length) return startAngle;
+        startAngle = x;
+        return angle_histogram;
+    };
+
+    angle_histogram.endAngle = function (x) {
+        if (!arguments.length) return endAngle;
+        endAngle = x;
         return angle_histogram;
     };
 
