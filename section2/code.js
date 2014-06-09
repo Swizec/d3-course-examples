@@ -21,7 +21,7 @@
     var draw = function (data, x, y) {
         var gradient = d3.scale.linear()
                 .domain([3/24, 5/24, 8/24, 12/24, 18/24, 20/24, 22/24].map(d3.interpolate(0, data.length)))
-                .range(['#000d20', '#bf4a07', '#4686dd', '#85c1f5', '#4686dd', '#ca3a22', '#000d20']),
+                .range(['#00001f', '#bf4a07', '#4686dd', '#85c1f5', '#4686dd', '#ca3a22', '#00001f']),
             colors = d3.scale.category20c(),
             arc = d3.svg.arc(),
             slice = svg.selectAll('.slice')
@@ -68,11 +68,11 @@
                     return d.time.getHours();
                 })
                 .bins(24)
-                .innerRadius(200)
-                .maxHeight(d3.scale.log().range([0, 250]))
+                .innerRadius(150)
+                .maxHeight(d3.scale.log().range([0, 200]))
                 .minHeight(function (min_val) { return min_val/2; });
         
-        draw(histogram(data), 500, 500);
+        draw(histogram(data), 400, 400);
     });
 
 })();
