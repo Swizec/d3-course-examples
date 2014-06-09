@@ -19,6 +19,11 @@ d3.layout.angle_histogram = function () {
                 .domain(bins.map(function (d) { return d.x; }))
                 .rangeBands([_startAngle, _endAngle], 0, 0);
 
+        maxHeight.domain([typeof minHeight === 'function'
+                            ? minHeight(d3.min(bins.map(function (d) { return d.y; }))) 
+                            : minHeight,
+                          d3.max(bins.map(function (d) { return d.y; }))]);
+
         bins = bins.map(function (d, i) {
             d.innerRadius = typeof innerRadius === 'function' ?     
                 innerRadius(d, i) : innerRadius;
@@ -26,17 +31,8 @@ d3.layout.angle_histogram = function () {
             d.value = histogram.value()(d[0]);
             d.startAngle = radians(d.x)-radians.rangeBand()/2;
             d.endAngle = radians(d.x)+radians.rangeBand()/2;
-
-            return d;
-        });
-
-        maxHeight.domain([typeof minHeight === 'function'
-                            ? minHeight(d3.min(bins.map(function (d) { return d.y; }))) 
-                            : minHeight,
-                          d3.max(bins.map(function (d) { return d.y; }))]);
-
-        bins = bins.map(function (d) {
             d.outerRadius = d.innerRadius+maxHeight(d.y);
+
             return d;
         });
 
