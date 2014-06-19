@@ -19,6 +19,6 @@
 				link: a.href};
 		    });
                 
-                console.log(a.href);
+                console.log(data);
 	    });
 })();
