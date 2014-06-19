@@ -31,6 +31,8 @@
     var fetch_a_state = function (state, callback) {
         callback || (callback = function () {});
 
+        console.log("Fetching", state.state);
+
         d3.html(state.link, function (fragment) {
             var time_formatter = d3.time.format("%x %H:%M"),
                 posted_formatter = d3.time.format("%x");
@@ -53,13 +55,15 @@
                     return parsed;
                 });
 
-            console.log(data[0]);
+            callback(null, data);
         });
     };
 
     d3.html("state-index.html", function (fragment) {
         var index = parse_index(fragment);
-                
-        fetch_a_state(index[0]);
+
+        async.map(index, fetch_a_state, function (err, data) {
+            console.log(data.length);
+        });
     });
 })();
