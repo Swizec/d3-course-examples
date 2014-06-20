@@ -1,16 +1,15 @@
 
 (function () {
 
-    var svg = d3.select("#graph")
-	    .append("svg")
-	    .style({width: "100%",
-		    height: 1024});
-
     var slugify = function (string) {
         return string
             .toLowerCase()
             .replace(/ /g,'-')
             .replace(/[^\w-]+/g,'-');
+    };
+
+    var time_taken = function (since) {
+        return (((new Date())-since)/1000)+"s";
     };
 
     var parse_index = function (fragment) {
@@ -79,24 +78,39 @@
             start = new Date();
 
         async.map(index, fetch_a_state, function (err, data) {
-            var time_taken = ((new Date())-start)/1000;
-
             var time_formatter = d3.time.format("%x %H:%M"),
                 posted_formatter = d3.time.format("%x");
 
             console.log(data.length);
-            console.log(time_taken+"s");
+            console.log(time_taken(start));
 
-            d3.csv.format(
-                data[0].data.map(function (datum) {
+            start = new Date();
+            
+            data = data.map(function (datum) {
+                return datum.data.map(function (datum) {
                     
                     datum.time = time_formatter(datum.time);
                     datum.posted = posted_formatter(datum.posted);
                     
                     return datum;
-                })
-            );
-            //console.log(d3.csv.format(data[0]));
+                });
+            }).reduce(function (a, b) {
+                return a.concat(b);
+            });
+
+            console.log("reshaped data for csv", time_taken(start));
+
+            var csv = d3.csv.format(data);
+
+            console.log("got csv", time_taken(start));
+
+            d3.select("#graph")
+                .append("textarea")
+                .style({width: "100%",
+                        height: "900px"});
+                //.html(csv);
+
+            //console.log(time_taken+"s");
         });
     });
 })();
