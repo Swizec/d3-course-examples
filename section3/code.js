@@ -100,17 +100,24 @@
 
             console.log("reshaped data for csv", time_taken(start));
 
-            var csv = d3.csv.format(data);
-
+            var csv = d3.csv.format(data).split("\n"),
+                output = d3.select("#graph")
+                    .append("textarea")
+                    .style({width: "100%",
+                            height: "900px"});
+            
             console.log("got csv", time_taken(start));
 
-            d3.select("#graph")
-                .append("textarea")
-                .style({width: "100%",
-                        height: "900px"});
-                //.html(csv);
-
-            //console.log(time_taken+"s");
+            async.eachSeries(csv, function (line, callback) {
+                setTimeout(function () {
+                    line = document.createTextNode(line+"\n");
+                    output[0][0].appendChild(line);
+                    
+                    callback();
+                }, 0);
+            }, function (err) {
+                console.log("Done in", time_taken+"s");
+            });
         });
     });
 })();
