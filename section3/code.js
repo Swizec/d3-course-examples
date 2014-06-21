@@ -13,8 +13,6 @@
     };
 
     var parse_index = function (fragment) {
-	var formatter = d3.time.format("%x");
-
         return Array.prototype.map.call(
 	    fragment.querySelectorAll("tbody tr"),
 	    function (row) {
