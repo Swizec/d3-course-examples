@@ -66,7 +66,7 @@ d3.layout.angle_histogram = function () {
     };
 
     angle_histogram.minHeight = function (x) {
-        if (!arguments.length) return innerRadius;
+        if (!arguments.length) return minHeight;
         minHeight = x;
         return angle_histogram;
     };
