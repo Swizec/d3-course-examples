@@ -22,7 +22,6 @@
         var gradient = d3.scale.linear()
                 .domain([3/24, 5/24, 8/24, 12/24, 18/24, 20/24, 22/24].map(d3.interpolate(0, data.length)))
                 .range(['#00001f', '#bf4a07', '#4686dd', '#85c1f5', '#4686dd', '#ca3a22', '#00001f']),
-            colors = d3.scale.category20c(),
             arc = d3.svg.arc(),
             slice = svg.selectAll('.slice')
                 .data(data)
