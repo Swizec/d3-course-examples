@@ -16,7 +16,11 @@
 
     queue()
         .defer(d3.json, "us.json")
-        .await(function (err, US) {
+        .defer(d3.csv, "full-data.csv")
+        .await(function (err, US, ufos) {
+            ufos = _.groupBy(ufos.filter(function (ufo) { return !!ufo.state; }),
+                             function (ufo) { return ufo.state; });
+
             console.log(US);
 
             svg.append("g")
