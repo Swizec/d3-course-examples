@@ -17,10 +17,20 @@
     queue()
         .defer(d3.json, "us.json")
         .await(function (err, US) {
+            console.log(US);
+
+            svg.append("g")
+                .attr("class", "states")
+                .selectAll("path")
+                .data(topojson.feature(US, US.objects.states).features)
+                .enter().append("path")
+                //.attr("class", function(d) { return quantize(rateById.get(d.id)); })
+                .attr("d", path);
+
             svg.append("path")
                 .datum(topojson.mesh(US, US.objects.states, 
                                      function(a, b) { return a !== b; }))
-                .attr("class", "states")
+                .attr("class", "borders")
                 .attr("d", path);
         });
 
