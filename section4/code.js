@@ -75,6 +75,16 @@
             ufos = _.groupBy(ufos.filter(function (ufo) { return !!ufo.state; }),
                              function (ufo) { return ufo.state; });
 
+            var ufoCounts = _.mapValues(ufos, function (ufo) {
+                return ufo.length;
+            });
+
+            var quantize = d3.scale.quantize()
+                    .domain(d3.extent(_.values(ufoCounts)))
+                    .range(d3.range(9).map(function(i) { return "q" + i + "-9"; }));
+
+            console.log(_.values(ufoCounts));
+
             var states = svg.append("g")
                     .attr("class", "states")
                     .selectAll("g")
@@ -83,10 +93,9 @@
 
             states.append("path")
                 .attr("d", path)
-                .on("click", function (d) {
-                    console.log(d, d.id, path.centroid(d));
+                .attr("class", function(d) { 
+                    return quantize(ufoCounts[stateIdMap.get(d.id)]); 
                 });
-
             
             svg.append("path")
                 .datum(topojson.mesh(US, US.objects.states, 
