@@ -75,12 +75,6 @@
             ufos = _.groupBy(ufos.filter(function (ufo) { return !!ufo.state; }),
                              function (ufo) { return ufo.state; });
 
-            console.log("geometries", _.sortBy(_.pluck(US.objects.states.geometries, "id")));
-            console.log("map", _.sortBy(stateIdMap.keys(), Number));
-
-            console.log(_.xor(_.pluck(US.objects.states.geometries, "id"),
-                              _.map(stateIdMap.keys(), Number)));
-
             var states = svg.append("g")
                     .attr("class", "states")
                     .selectAll("g")
@@ -101,7 +95,7 @@
                 .attr("d", path);
 
             states.append("text")
-                .text(function (d) { return d.id; })
+                .text(function (d) { return stateIdMap.get(d.id) || d.id; })
                 .attr({
                     x: function (d) { return path.centroid(d)[0] || 0; },
                     y: function (d) { return path.centroid(d)[1] || 0; }
