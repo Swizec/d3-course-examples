@@ -9,3 +9,7 @@
 .states {
     fill: lightblue;
 }
+
+text {
+    stroke: black;
+}
