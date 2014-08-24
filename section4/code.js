@@ -81,9 +81,9 @@
 
             var quantize = d3.scale.quantize()
                     .domain(d3.extent(_.values(ufoCounts)))
-                    .range(d3.range(9).map(function(i) { return "q" + i + "-9"; }));
+                    .range(d3.range(6).map(function(i) { return "q" + i + "-6  "; }));
 
-            console.log(_.values(ufoCounts));
+            console.log(d3.extent(_.values(ufoCounts)));
 
             var states = svg.append("g")
                     .attr("class", "states")
