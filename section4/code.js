@@ -70,10 +70,10 @@
         knownStates = _.sortBy(stateIdMap.values());
 
     queue()
-        .defer(d3.json, "us.json")
-        .defer(d3.json, "states-hash.json")
-        .defer(d3.csv, "state-populations.csv")
-        .defer(d3.csv, "full-data.csv")
+        .defer(d3.json, "data/us.json")
+        .defer(d3.json, "data/states-hash.json")
+        .defer(d3.csv, "data/state-populations.csv")
+        .defer(d3.csv, "data/full-data.csv")
         .await(function (err, US, states_hash, populations, ufos) {
             ufos = _.groupBy(ufos
                              .filter(function (ufo) { return !!ufo.state; })
@@ -99,7 +99,7 @@
 
             var quantize = d3.scale.quantize()
                     .domain(d3.extent(_.values(ufoCounts)))
-                    .range(d3.range(6).map(function(i) { return "q" + i + "-6"; }));
+                    .range(d3.range(9).map(function(i) { return "q" + i + "-9-green"; }));
 
             var states = svg.append("g")
                     .attr("class", "states")
@@ -119,12 +119,12 @@
                 .attr("class", "borders")
                 .attr("d", path);
 
-            states.append("text")
-                .text(function (d) { return stateIdMap.get(d.id) || d.id; })
-                .attr({
-                    x: function (d) { return path.centroid(d)[0] || 0; },
-                    y: function (d) { return path.centroid(d)[1] || 0; }
-                });
+            // states.append("text")
+            //     .text(function (d) { return stateIdMap.get(d.id) || d.id; })
+            //     .attr({
+            //         x: function (d) { return path.centroid(d)[0] || 0; },
+            //         y: function (d) { return path.centroid(d)[1] || 0; }
+            //     });
         });
 
 })();
