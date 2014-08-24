@@ -66,24 +66,40 @@
         54: "WV",
         55: "WI",
         56: "WY"
-    });
+    }),
+        knownStates = _.sortBy(stateIdMap.values());
 
     queue()
         .defer(d3.json, "us.json")
+        .defer(d3.json, "states-hash.json")
+        .defer(d3.csv, "state-populations.csv")
         .defer(d3.csv, "full-data.csv")
-        .await(function (err, US, ufos) {
-            ufos = _.groupBy(ufos.filter(function (ufo) { return !!ufo.state; }),
+        .await(function (err, US, states_hash, populations, ufos) {
+            ufos = _.groupBy(ufos
+                             .filter(function (ufo) { return !!ufo.state; })
+                             .filter(function (ufo) { 
+                                 return _.indexOf(knownStates, ufo.state, true) >= 0; }),
                              function (ufo) { return ufo.state; });
 
-            var ufoCounts = _.mapValues(ufos, function (ufo) {
-                return ufo.length;
+            populations = d3.map(_.zipObject(
+                populations.map(function (p) { return p.State.toLowerCase(); }),
+                populations.map(function (p) {
+                    var years = [2010, 2011, 2012, 2013];
+                    return _.zipObject(years,
+                                       years.map(function (y) {
+                                           return Number(p[y].replace(/\./g, "")); }));
+                })));
+
+            states = d3.map(_.mapValues(states_hash,
+                                        function (s) { return s.toLowerCase(); }));
+
+            var ufoCounts = _.mapValues(ufos, function (ufo, state) {
+                return ufo.length/populations.get(states.get(state))[2010];
             });
 
             var quantize = d3.scale.quantize()
                     .domain(d3.extent(_.values(ufoCounts)))
-                    .range(d3.range(6).map(function(i) { return "q" + i + "-6  "; }));
-
-            console.log(d3.extent(_.values(ufoCounts)));
+                    .range(d3.range(6).map(function(i) { return "q" + i + "-6"; }));
 
             var states = svg.append("g")
                     .attr("class", "states")
