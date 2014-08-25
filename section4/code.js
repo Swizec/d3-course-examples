@@ -20,23 +20,9 @@
         .defer(d3.csv, "data/state-populations.csv")
         .defer(d3.csv, "data/full-data.csv")
         .await(function (err, US, states_hash, populations, ufos) {
-            ufos = _.groupBy(ufos
-                             .filter(function (ufo) { return !!ufo.state; })
-                             .filter(function (ufo) { 
-                                 return _.indexOf(knownStates, ufo.state, true) >= 0; }),
-                             function (ufo) { return ufo.state; });
-
-            populations = d3.map(_.zipObject(
-                populations.map(function (p) { return p.State.toLowerCase(); }),
-                populations.map(function (p) {
-                    var years = [2010, 2011, 2012, 2013];
-                    return _.zipObject(years,
-                                       years.map(function (y) {
-                                           return Number(p[y].replace(/\./g, "")); }));
-                })));
-
-            states = d3.map(_.mapValues(states_hash,
-                                        function (s) { return s.toLowerCase(); }));
+            ufos = prepare.ufos(ufos);
+            populations = prepare.populations(populations);
+            states = prepare.states(states_hash);
 
             var ufoCounts = _.mapValues(ufos, function (ufo, state) {
                 return ufo.length/populations.get(states.get(state))[2010];

@@ -53,3 +53,29 @@ var stateIdMap = d3.map({
     56: "WY"
 }),
     knownStates = _.sortBy(stateIdMap.values());
+
+var prepare = {
+    ufos: function (ufos) {
+        return _.groupBy(ufos
+                         .filter(function (ufo) { return !!ufo.state; })
+                         .filter(function (ufo) { 
+                             return _.indexOf(knownStates, ufo.state, true) >= 0; }),
+                         function (ufo) { return ufo.state; });
+    },
+
+    states: function (states) {
+        return d3.map(_.mapValues(states,
+                                  function (s) { return s.toLowerCase(); }));
+    },
+    
+    populations: function (populations) {
+        return d3.map(_.zipObject(
+            populations.map(function (p) { return p.State.toLowerCase(); }),
+            populations.map(function (p) {
+                var years = [2010, 2011, 2012, 2013];
+                return _.zipObject(years,
+                                   years.map(function (y) {
+                                       return Number(p[y].replace(/\./g, "")); }));
+            })));
+    }
+};
