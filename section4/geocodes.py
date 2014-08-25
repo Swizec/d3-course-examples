@@ -10,35 +10,39 @@ from geopy.geocoders import Bing
 #bing = omgeo.services.Bing(settings={"api_key": "AtvTgjJ5FOjkgB5I291TXiDZFVZ7XK2_o4mqIBekDtcg0tDSBqmJpfjJckYqd2la"})
 #geocoder = Geocoder(sources=[['bing', {}],])
 
-bing = Bing("AtvTgjJ5FOjkgB5I291TXiDZFVZ7XK2_o4mqIBekDtcg0tDSBqmJpfjJckYqd2la")
+bing = Bing("AtvTgjJ5FOjkgB5I291TXiDZFVZ7XK2_o4mqIBekDtcg0tDSBqmJpfjJckYqd2la",
+            timeout=10)
 
 STATES = ["AK", "AL", "AR", "AZ", "CA", "CO", "CT", "DC", "DE", "FL", "GA", "HI", "IA", "ID", "IL", "IN", "KS", "KY", "LA", "MA", "MD", "ME", "MI", "MN", "MO", "MS", "MT", "NC", "ND", "NE", "NH", "NJ", "NM", "NV", "NY", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VA", "VT", "WA", "WI", "WV", "WY"]
 
-#LAST = """09/01/2010 06:45,Garden Grove,CA,Sphere,10 seconds,I witnessed to UFO's collide,04/18/2012,33.7739053,-117.9414477""".split(",")
+LAST = """03/16/2013 05:10,North Pole,AK,Light,1 minute,Two lights in the sky moving opposet each other not making sound,05/15/2013,64.7487792969,-147.352554321""".split(",")
 
 def fetch():
     with open("data/full-data.csv") as csvin:
         reader = csv.reader(csvin)
 
-        with open("data/full-data-geodata.csv", "wb") as csvout:
+        with open("data/full-data-geodata.csv", "ab") as csvout:
             writer = csv.writer(csvout)
 
             head = reader.next()
             head += ['lat', 'lon']
 
-            writer.writerow(head)
+            #writer.writerow(head)
 
             candidates = (row for row in reader if row[2] != "" and row[2] in STATES)
 
             for row in candidates:
-                if row[0] == LAST[0] and row[1] == LAST[1] and row[2] == LAST[2]:
-                    break
+                 if row[0] == LAST[0] and row[1] == LAST[1] and row[2] == LAST[2]:
+                     break
 
             for row in candidates:
-                loc = bing.geocode(row[1])
-                row += [loc.latitude, loc.longitude]
+                loc = bing.geocode(", ".join([row[1], row[2]]))
+                if loc:
+                    row += [loc.latitude, loc.longitude]
 
-                writer.writerow(row)
+                    print row
+
+                    writer.writerow(row)
                 # try:
                 #     row += [v for (k, v) in
                 #             maps.geocode(row[1])[0]['geometry']['location'].items()]
