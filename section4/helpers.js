@@ -55,11 +55,15 @@ var stateIdMap = d3.map({
     knownStates = _.sortBy(stateIdMap.values());
 
 var prepare = {
+    filter_ufos: function (ufos) {
+        return ufos
+            .filter(function (ufo) { return !!ufo.state; })
+            .filter(function (ufo) { 
+                return _.indexOf(knownStates, ufo.state, true) >= 0; });
+    },
+
     ufos: function (ufos) {
-        return _.groupBy(ufos
-                         .filter(function (ufo) { return !!ufo.state; })
-                         .filter(function (ufo) { 
-                             return _.indexOf(knownStates, ufo.state, true) >= 0; }),
+        return _.groupBy(ufos,
                          function (ufo) { return ufo.state; });
     },
 

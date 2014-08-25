@@ -19,13 +19,20 @@
         .defer(d3.json, "data/states-hash.json")
         .defer(d3.csv, "data/state-populations.csv")
         .defer(d3.csv, "data/full-data.csv")
-        .await(function (err, US, states_hash, populations, ufos) {
-            ufos = prepare.ufos(ufos);
+        .await(function (err, US, states_hash, populations, _ufos) {
+            _ufos = prepare.filter_ufos(_ufos);
+            var ufos = prepare.ufos(_ufos);
             populations = prepare.populations(populations);
             states = prepare.states(states_hash);
 
-            var ufoCounts = _.mapValues(ufos, function (ufo, state) {
-                return ufo.length/populations.get(states.get(state))[2010];
+            console.log(_.keys(_.mapValues(_.groupBy(_ufos,
+                                              function (ufo) { return ufo.city; }),
+                                    function (ufos, city) {
+                                        return ufos.length;
+                                    })).length);
+
+            var ufoCounts = _.mapValues(ufos, function (ufos, state) {
+                return ufos.length/populations.get(states.get(state))[2010];
             });
 
             var quantize = d3.scale.quantize()
