@@ -1,5 +1,5 @@
 
-import csv
+import csv, gmaps
 #from geocode import latlon, NoResultError
 from gmaps import Geocoding
 
@@ -26,9 +26,13 @@ def fetch():
                     maps.geocode(c[1])[0]['geometry']['location'].items()]
 
             for row in candidates:
-                row += [v for (k, v) in
-                        maps.geocode(row[1])[0]['geometry']['location'].items()]
-                writer.writerow(row)
+                try:
+                    row += [v for (k, v) in
+                            maps.geocode(row[1])[0]['geometry']['location'].items()]
+                    print row
+                    writer.writerow(row)
+                except gmaps.errors.NoResults:
+                    pass
 
                 # try:
                 #     row += latlon(row[1], center=True, throttle=0.1, round_digits=3)
