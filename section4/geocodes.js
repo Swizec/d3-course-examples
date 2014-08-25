@@ -17,17 +17,23 @@
                       function (ufo, callback) {
                           console.log(ufo.time, ufo.city, ufo.state, ufo.summary);
 
-                          Gmaps.geocode({
+                          GMaps.geocode({
                               address: ufo.city,
                               callback: function (results, status) {
                                   if (status != "OK") {
                                       console.log(status, results);
-                                      return callback(new Error("Failed GMaps"));
+                                      if (status == "ZERO_RESULTS") {
+                                          return callback(null, ufo);
+                                      }else{
+                                          return callback(new Error("Query Limit!"));
+                                      }
                                   }
 
                                   var latlng = results[0].geometry.location;
                                   ufo.lat = latlng.lat();
                                   ufo.lon = latlng.lng();
+
+                                  callback(null, ufo);
                               }
                           });
                       },
