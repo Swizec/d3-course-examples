@@ -3,11 +3,12 @@ import csv, gmaps
 #from geocode import latlon, NoResultError
 from gmaps import Geocoding
 
-maps = Geocoding(api_key="AIzaSyB9lcJWc0pHQk89WF_MJ6OcyttOqx0t4LE")
+#maps = Geocoding(api_key="AIzaSyB9lcJWc0pHQk89WF_MJ6OcyttOqx0t4LE")
+maps = Geocoding(api_key="AIzaSyBfpW7AtJNiLd1xCY6_Vh5Q7BS2d9wARgA")
 
 STATES = ["AK", "AL", "AR", "AZ", "CA", "CO", "CT", "DC", "DE", "FL", "GA", "HI", "IA", "ID", "IL", "IN", "KS", "KY", "LA", "MA", "MD", "ME", "MI", "MN", "MO", "MS", "MT", "NC", "ND", "NE", "NH", "NJ", "NM", "NV", "NY", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VA", "VT", "WA", "WI", "WV", "WY"]
 
-LAST = """04/07/2014 12:54,Pleasanton,CA,Sphere,2 seconds,"Description: Two spherical objects, as if anchored together. Summary: Unusual object entering the atmosphere.Color: Two blue ob",04/11/2014,37.6624312,-121.8746789""".split(",")
+LAST = """09/01/2010 06:45,Garden Grove,CA,Sphere,10 seconds,I witnessed to UFO's collide,04/18/2012,33.7739053,-117.9414477""".split(",")
 
 def fetch():
     with open("data/full-data.csv") as csvin:
