@@ -13,6 +13,34 @@
                 return d.time == last.time && d.city == last.city && d.summary == last.summary;
             }));
 
-            console.log(ufos.length);
+            async.map(ufos,
+                      function (ufo, callback) {
+                          console.log(ufo.time, ufo.city, ufo.state, ufo.summary);
+
+                          Gmaps.geocode({
+                              address: ufo.city,
+                              callback: function (results, status) {
+                                  if (status != "OK") {
+                                      console.log(status, results);
+                                      return callback(new Error("Failed GMaps"));
+                                  }
+
+                                  var latlng = results[0].geometry.location;
+                                  ufo.lat = latlng.lat();
+                                  ufo.lon = latlng.lng();
+                              }
+                          });
+                      },
+                      function (err, data) {
+                          if (err) return console.log(err);
+
+                          var csv = d3.csv.format(data);
+            
+                          var blob = new Blob([csv], {type: "text/plain;charset=utf-8"});
+            
+                          console.log("got csv");
+
+                          saveAs(blob, "full-data-geodata.csv");
+                      });
         });
 })();
