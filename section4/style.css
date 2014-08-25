@@ -14,6 +14,12 @@ text {
     stroke: black;
 }
 
+.point {
+    stroke: grey;
+    stroke-width: 1px;
+    fill: white;
+}
+
 .q0-9-blue { fill:rgb(247,251,255); }
 .q1-9-blue { fill:rgb(222,235,247); }
 .q2-9-blue { fill:rgb(198,219,239); }

@@ -18,15 +18,12 @@
         .defer(d3.json, "data/us.json")
         .defer(d3.json, "data/states-hash.json")
         .defer(d3.csv, "data/state-populations.csv")
-        .defer(d3.csv, "data/full-data.csv")
+        .defer(d3.csv, "data/full-data-geodata.csv")
         .await(function (err, US, states_hash, populations, _ufos) {
             _ufos = prepare.filter_ufos(_ufos);
             var ufos = prepare.ufos(_ufos);
             populations = prepare.populations(populations);
             states = prepare.states(states_hash);
-
-            console.log(_ufos.length);
-            console.log(knownStates);
 
             // console.log(_.values(_.mapValues(_.groupBy(_ufos,
             //                                   function (ufo) { return ufo.city; }),
@@ -66,6 +63,19 @@
             //         x: function (d) { return path.centroid(d)[0] || 0; },
             //         y: function (d) { return path.centroid(d)[1] || 0; }
             //     });
+
+
+            svg.append("g")
+                .selectAll("circle")
+                .data(_ufos.filter(function (d) { return !!projection([d.lon, d.lat]); }))
+                .enter()
+                .append("circle")
+                .attr({
+                    cx: function (d) { return projection([d.lon, d.lat])[0]; },
+                    cy: function (d) { return projection([d.lon, d.lat])[1]; },
+                    r: 2,
+                    class: "point"
+                });
         });
 
 })();
