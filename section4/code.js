@@ -25,11 +25,14 @@
             populations = prepare.populations(populations);
             states = prepare.states(states_hash);
 
-            console.log(_.keys(_.mapValues(_.groupBy(_ufos,
-                                              function (ufo) { return ufo.city; }),
-                                    function (ufos, city) {
-                                        return ufos.length;
-                                    })).length);
+            console.log(_ufos.length);
+            console.log(knownStates);
+
+            // console.log(_.values(_.mapValues(_.groupBy(_ufos,
+            //                                   function (ufo) { return ufo.city; }),
+            //                         function (ufos, city) {
+            //                             return ufos.length;
+            //                         })).length);
 
             var ufoCounts = _.mapValues(ufos, function (ufos, state) {
                 return ufos.length/populations.get(states.get(state))[2010];
