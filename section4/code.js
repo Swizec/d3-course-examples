@@ -73,7 +73,7 @@
                 .attr({
                     cx: function (d) { return projection([d.lon, d.lat])[0]; },
                     cy: function (d) { return projection([d.lon, d.lat])[1]; },
-                    r: 2,
+                    r: 1,
                     class: "point"
                 });
         });

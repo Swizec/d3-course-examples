@@ -1,5 +1,5 @@
 
-import csv, gmaps
+import csv, gmaps, geopy
 #from geocode import latlon, NoResultError
 #from gmaps import Geocoding
 #from omgeo import Geocoder
@@ -11,11 +11,11 @@ from geopy.geocoders import Bing
 #geocoder = Geocoder(sources=[['bing', {}],])
 
 bing = Bing("AtvTgjJ5FOjkgB5I291TXiDZFVZ7XK2_o4mqIBekDtcg0tDSBqmJpfjJckYqd2la",
-            timeout=10)
+            timeout=20)
 
 STATES = ["AK", "AL", "AR", "AZ", "CA", "CO", "CT", "DC", "DE", "FL", "GA", "HI", "IA", "ID", "IL", "IN", "KS", "KY", "LA", "MA", "MD", "ME", "MI", "MN", "MO", "MS", "MT", "NC", "ND", "NE", "NH", "NJ", "NM", "NV", "NY", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VA", "VT", "WA", "WI", "WV", "WY"]
 
-LAST = """03/16/2013 05:10,North Pole,AK,Light,1 minute,Two lights in the sky moving opposet each other not making sound,05/15/2013,64.7487792969,-147.352554321""".split(",")
+LAST = """06/30/1971 14:00,Yellowstone National Park,WY,Egg,not known,Old photos from 1871 show what appears to be objects in the air.,12/12/2009,44.6204948425,-110.490531921""".split(",")
 
 def fetch():
     with open("data/full-data.csv") as csvin:
@@ -36,7 +36,12 @@ def fetch():
                      break
 
             for row in candidates:
-                loc = bing.geocode(", ".join([row[1], row[2]]))
+                try:
+                    loc = bing.geocode(", ".join([row[1], row[2]]))
+                except geopy.exc.GeocoderQueryError:
+                    print "GEOCODER QUERY ERROR"
+                    continue
+
                 if loc:
                     row += [loc.latitude, loc.longitude]
 
@@ -53,3 +58,4 @@ def fetch():
 
 if __name__ == "__main__":
     fetch()
+    print "Done."
