@@ -35,9 +35,9 @@
 
             var states = svg.append("g")
                     .attr("class", "states")
-                    .selectAll("g")
+                    .selectAll("path")
                     .data(topojson.feature(US, US.objects.states).features)
-                    .enter().append("g");
+                    .enter();
 
             states.append("path")
                 .attr("d", path)
