@@ -25,12 +25,6 @@
             populations = prepare.populations(populations);
             states = prepare.states(states_hash);
 
-            // console.log(_.values(_.mapValues(_.groupBy(_ufos,
-            //                                   function (ufo) { return ufo.city; }),
-            //                         function (ufos, city) {
-            //                             return ufos.length;
-            //                         })).length);
-
             var ufoCounts = _.mapValues(ufos, function (ufos, state) {
                 return ufos.length/populations.get(states.get(state))[2010];
             });
@@ -56,14 +50,6 @@
                                      function(a, b) { return a !== b; }))
                 .attr("class", "borders")
                 .attr("d", path);
-
-            // states.append("text")
-            //     .text(function (d) { return stateIdMap.get(d.id) || d.id; })
-            //     .attr({
-            //         x: function (d) { return path.centroid(d)[0] || 0; },
-            //         y: function (d) { return path.centroid(d)[1] || 0; }
-            //     });
-
 
             svg.append("g")
                 .selectAll("circle")
