@@ -79,11 +79,7 @@
                     .enter().append("g");
 
             states.append("path")
-                .attr("d", path)
-                .on("click", function (d) {
-                    console.log(d, d.id, path.centroid(d));
-                });
-
+                .attr("d", path);
             
             svg.append("path")
                 .datum(topojson.mesh(US, US.objects.states, 
