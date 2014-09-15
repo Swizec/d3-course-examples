@@ -51,14 +51,18 @@
                 .attr("class", "borders")
                 .attr("d", path);
 
+            var positions = _ufos
+                    .map(function (d) { return projection([d.lon, d.lat]); })
+                    .filter(function (d) { return !!d; });
+
             svg.append("g")
                 .selectAll("circle")
-                .data(_ufos.filter(function (d) { return !!projection([d.lon, d.lat]); }))
+                .data(positions)
                 .enter()
                 .append("circle")
                 .attr({
-                    cx: function (d) { return projection([d.lon, d.lat])[0]; },
-                    cy: function (d) { return projection([d.lon, d.lat])[1]; },
+                    cx: function (d) { return d[0]; },
+                    cy: function (d) { return d[1]; },
                     r: 1,
                     class: "point"
                 });
