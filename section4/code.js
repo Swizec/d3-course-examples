@@ -67,8 +67,12 @@
                         vectors.push(d.vector);
                     });
 
-            var clusters = figue.kmeans(50, vectors);
+            //var clusters = figue.kmeans(100, vectors);
             //console.log(clusters);
+
+            console.log(vectors.length);
+            //var root = figue.agglomerate(labels, vectors , figue.EUCLIDIAN_DISTANCE,figue.SINGLE_LINKAGE) ;
+            //console.log(root);
 
             svg.append("g")
                 .selectAll("circle")
