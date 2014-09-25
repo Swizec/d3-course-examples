@@ -51,13 +51,29 @@
                 .attr("class", "borders")
                 .attr("d", path);
 
-            var positions = _ufos
-                    .map(function (d) { return projection([d.lon, d.lat]); })
-                    .filter(function (d) { return !!d; });
+            // var positions = _ufos
+            //         .map(function (d) { return projection([d.lon, d.lat]); })
+            //         .filter(function (d) { return !!d; });
+
+            var labels = [],
+                vectors = [],
+                for_clustering = _ufos
+                    .map(function (d) { return {
+                        label: [d.city, d.state, d.shape].join("-"),
+                        vector: projection([d.lon, d.lat])}; })
+                    .filter(function (d) { return !!d.vector; })
+                    .forEach(function (d) {
+                        labels.push(d.label);
+                        vectors.push(d.vector);
+                    });
+
+            var clusters = figue.kmeans(50, vectors);
+            //console.log(clusters);
 
             svg.append("g")
                 .selectAll("circle")
-                .data(positions)
+                //.data(positions)
+                .data(clusters.centroids)
                 .enter()
                 .append("circle")
                 .attr({
