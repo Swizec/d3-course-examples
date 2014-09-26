@@ -61,31 +61,36 @@
                     .map(function (d) { return {
                         label: [d.city, d.state, d.shape].join("-"),
                         vector: projection([d.lon, d.lat])}; })
-                    .filter(function (d) { return !!d.vector; })
-                    .forEach(function (d) {
-                        labels.push(d.label);
-                        vectors.push(d.vector);
-                    });
+                    .filter(function (d) { return !!d.vector; });
+                    //.forEach(function (d) {
+                    //    labels.push(d.label);
+                    //    vectors.push(d.vector);
+                    //});
+            
+
+            var blob = new Blob([JSON.stringify(for_clustering)], {type: "text/plain;charset=utf-8"});
+            
+            saveAs(blob, "clustering-data.json");
 
             //var clusters = figue.kmeans(100, vectors);
             //console.log(clusters);
 
-            console.log(vectors.length);
+            //console.log(vectors.length);
             //var root = figue.agglomerate(labels, vectors , figue.EUCLIDIAN_DISTANCE,figue.SINGLE_LINKAGE) ;
             //console.log(root);
 
-            svg.append("g")
-                .selectAll("circle")
-                //.data(positions)
-                .data(clusters.centroids)
-                .enter()
-                .append("circle")
-                .attr({
-                    cx: function (d) { return d[0]; },
-                    cy: function (d) { return d[1]; },
-                    r: 1,
-                    class: "point"
-                });
+            // svg.append("g")
+            //     .selectAll("circle")
+            //     //.data(positions)
+            //     .data(clusters.centroids)
+            //     .enter()
+            //     .append("circle")
+            //     .attr({
+            //         cx: function (d) { return d[0]; },
+            //         cy: function (d) { return d[1]; },
+            //         r: 1,
+            //         class: "point"
+            //     });
         });
 
 })();
