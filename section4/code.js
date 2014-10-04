@@ -56,41 +56,40 @@
             //         .filter(function (d) { return !!d; });
 
             var labels = [],
-                vectors = [],
-                for_clustering = _ufos
-                    .map(function (d) { return {
-                        label: [d.city, d.state, d.shape].join("-"),
-                        vector: projection([d.lon, d.lat])}; })
-                    .filter(function (d) { return !!d.vector; });
-                    //.forEach(function (d) {
-                    //    labels.push(d.label);
-                    //    vectors.push(d.vector);
-                    //});
+                vectors = [];
+
+            _ufos
+                .map(function (d) { return {
+                    label: [d.city, d.state, d.shape].join("-"),
+                    vector: projection([d.lon, d.lat])}; })
+                .filter(function (d) { return !!d.vector; })
+                .forEach(function (d) {
+                    labels.push(d.label);
+                    vectors.push(d.vector);
+                });
             
 
-            var blob = new Blob([JSON.stringify(for_clustering)], {type: "text/plain;charset=utf-8"});
-            
-            saveAs(blob, "clustering-data.json");
+            var clusters = figue.kmeans(100, vectors);
+            var counts = _.mapValues(_.groupBy(clusters.assignments),
+                                     function (group) {
+                                         return group.length;
+                                     }),
+                R = d3.scale.linear()
+                    .domain([0, d3.max(_.values(counts))])
+                    .range([1, 20]);
 
-            //var clusters = figue.kmeans(100, vectors);
-            //console.log(clusters);
-
-            //console.log(vectors.length);
-            //var root = figue.agglomerate(labels, vectors , figue.EUCLIDIAN_DISTANCE,figue.SINGLE_LINKAGE) ;
-            //console.log(root);
-
-            // svg.append("g")
-            //     .selectAll("circle")
-            //     //.data(positions)
-            //     .data(clusters.centroids)
-            //     .enter()
-            //     .append("circle")
-            //     .attr({
-            //         cx: function (d) { return d[0]; },
-            //         cy: function (d) { return d[1]; },
-            //         r: 1,
-            //         class: "point"
-            //     });
+            svg.append("g")
+                .selectAll("circle")
+                //.data(positions)
+                .data(clusters.centroids)
+                .enter()
+                .append("circle")
+                .attr({
+                    cx: function (d) { return d[0]; },
+                    cy: function (d) { return d[1]; },
+                    r: function (d, i) { return R(counts[i]); },
+                    class: "point"
+                });
         });
 
 })();
