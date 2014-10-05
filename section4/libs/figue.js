@@ -587,5 +587,6 @@ Array.prototype.compare = function(testArr) {
 }
 
 
-
-module.exports = figue;
+if (module) {
+    module.exports = figue;
+}

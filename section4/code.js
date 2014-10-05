@@ -60,7 +60,7 @@
 
             _ufos
                 .map(function (d) { return {
-                    label: [d.city, d.state, d.shape].join("-"),
+                    label: [d.city, d.state].join(", "),
                     vector: projection([d.lon, d.lat])}; })
                 .filter(function (d) { return !!d.vector; })
                 .forEach(function (d) {
@@ -69,14 +69,29 @@
                 });
             
 
-            var clusters = figue.kmeans(100, vectors);
-            var counts = _.mapValues(_.groupBy(clusters.assignments),
+            var clusters = figue.kmeans(150, vectors);
+            var clustered = _.groupBy(clusters.assignments.map(function (cluster, i) {
+                return {label: labels[i],
+                        cluster: cluster};
+            }), "cluster"),
+                counts = _.mapValues(clustered,
                                      function (group) {
                                          return group.length;
                                      }),
                 R = d3.scale.linear()
                     .domain([0, d3.max(_.values(counts))])
                     .range([1, 20]);
+
+            var cities = function (cluster) {
+                return _.uniq(cluster.map(function (d) {
+                    return d.label;
+                }));
+            };
+
+            var blob = new Blob([JSON.stringify(_.values(clustered).map(cities))], 
+                                {type: "text/plain;charset=utf-8"});
+
+            saveAs(blob, "city-clusters.json");
 
             svg.append("g")
                 .selectAll("circle")
