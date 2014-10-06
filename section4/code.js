@@ -18,8 +18,9 @@
         .defer(d3.json, "data/us.json")
         .defer(d3.json, "data/states-hash.json")
         .defer(d3.csv, "data/state-populations.csv")
+        .defer(d3.json, "data/city-populations.json")
         .defer(d3.csv, "data/full-data-geodata.csv")
-        .await(function (err, US, states_hash, populations, _ufos) {
+        .await(function (err, US, states_hash, populations, city_populations, _ufos) {
             _ufos = prepare.filter_ufos(_ufos);
             var ufos = prepare.ufos(_ufos);
             populations = prepare.populations(populations);
@@ -69,29 +70,35 @@
                 });
             
 
-            var clusters = figue.kmeans(150, vectors);
+            var clusters = figue.kmeans(120, vectors);
             var clustered = _.groupBy(clusters.assignments.map(function (cluster, i) {
                 return {label: labels[i],
                         cluster: cluster};
             }), "cluster"),
-                counts = _.mapValues(clustered,
-                                     function (group) {
-                                         return group.length;
+                cluster_populations = _.mapValues(clustered, function (cluster) {
+                    var populations = cluster.map(function (d) {
+                        return {city: d.label.toLowerCase(),
+                                population: city_populations[d.label.toLowerCase()] || 0};
+                    });
+                    
+                    return _.uniq(populations, function (d) { return d.city; })
+                        .reduce(function (sum, d) {
+                            return sum+Number(d.population);
+                        }, 0);
+                }),
+                ratios = _.mapValues(clustered,
+                                     function (group, key) {
+                                         var population = cluster_populations[key];
+
+                                         if (population == 0) {
+                                             return 0;
+                                         }
+
+                                         return group.length/population;
                                      }),
                 R = d3.scale.linear()
-                    .domain([0, d3.max(_.values(counts))])
-                    .range([1, 20]);
-
-            var cities = function (cluster) {
-                return _.uniq(cluster.map(function (d) {
-                    return d.label;
-                }));
-            };
-
-            var blob = new Blob([JSON.stringify(_.values(clustered).map(cities))], 
-                                {type: "text/plain;charset=utf-8"});
-
-            saveAs(blob, "city-clusters.json");
+                    .domain([0, d3.max(_.values(ratios))])
+                    .range([2, 20]);
 
             svg.append("g")
                 .selectAll("circle")
@@ -102,7 +109,7 @@
                 .attr({
                     cx: function (d) { return d[0]; },
                     cy: function (d) { return d[1]; },
-                    r: function (d, i) { return R(counts[i]); },
+                    r: function (d, i) { return R(ratios[i]); },
                     class: "point"
                 });
         });
