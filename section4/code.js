@@ -18,8 +18,9 @@
         .defer(d3.json, "data/us.json")
         .defer(d3.json, "data/states-hash.json")
         .defer(d3.csv, "data/state-populations.csv")
+        .defer(d3.json, "data/city-populations.json")
         .defer(d3.csv, "data/full-data-geodata.csv")
-        .await(function (err, US, states_hash, populations, _ufos) {
+        .await(function (err, US, states_hash, populations, city_populations, _ufos) {
             _ufos = prepare.filter_ufos(_ufos);
             var ufos = prepare.ufos(_ufos);
             populations = prepare.populations(populations);
@@ -51,19 +52,64 @@
                 .attr("class", "borders")
                 .attr("d", path);
 
-            var positions = _ufos
-                    .map(function (d) { return projection([d.lon, d.lat]); })
-                    .filter(function (d) { return !!d; });
+            // var positions = _ufos
+            //         .map(function (d) { return projection([d.lon, d.lat]); })
+            //         .filter(function (d) { return !!d; });
+
+            var labels = [],
+                vectors = [];
+
+            _ufos
+                .map(function (d) { return {
+                    label: [d.city, d.state].join(", "),
+                    vector: projection([d.lon, d.lat])}; })
+                .filter(function (d) { return !!d.vector; })
+                .forEach(function (d) {
+                    labels.push(d.label);
+                    vectors.push(d.vector);
+                });
+            
+
+            var clusters = figue.kmeans(120, vectors);
+            var clustered = _.groupBy(clusters.assignments.map(function (cluster, i) {
+                return {label: labels[i],
+                        cluster: cluster};
+            }), "cluster"),
+                cluster_populations = _.mapValues(clustered, function (cluster) {
+                    var populations = cluster.map(function (d) {
+                        return {city: d.label.toLowerCase(),
+                                population: city_populations[d.label.toLowerCase()] || 0};
+                    });
+                    
+                    return _.uniq(populations, function (d) { return d.city; })
+                        .reduce(function (sum, d) {
+                            return sum+Number(d.population);
+                        }, 0);
+                }),
+                ratios = _.mapValues(clustered,
+                                     function (group, key) {
+                                         var population = cluster_populations[key];
+
+                                         if (population == 0) {
+                                             return 0;
+                                         }
+
+                                         return group.length/population;
+                                     }),
+                R = d3.scale.linear()
+                    .domain([0, d3.max(_.values(ratios))])
+                    .range([2, 20]);
 
             svg.append("g")
                 .selectAll("circle")
-                .data(positions)
+                //.data(positions)
+                .data(clusters.centroids)
                 .enter()
                 .append("circle")
                 .attr({
                     cx: function (d) { return d[0]; },
                     cy: function (d) { return d[1]; },
-                    r: 1,
+                    r: function (d, i) { return R(ratios[i]); },
                     class: "point"
                 });
         });
