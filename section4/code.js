@@ -19,8 +19,9 @@
         .defer(d3.json, "data/states-hash.json")
         .defer(d3.csv, "data/state-populations.csv")
         .defer(d3.json, "data/city-populations.json")
+        .defer(d3.xml, "data/military-bases.kml")
         .defer(d3.csv, "data/full-data-geodata.csv")
-        .await(function (err, US, states_hash, populations, city_populations, _ufos) {
+        .await(function (err, US, states_hash, populations, city_populations, military_bases, _ufos) {
             _ufos = prepare.filter_ufos(_ufos);
             var ufos = prepare.ufos(_ufos);
             populations = prepare.populations(populations);
@@ -51,10 +52,6 @@
                                      function(a, b) { return a !== b; }))
                 .attr("class", "borders")
                 .attr("d", path);
-
-            // var positions = _ufos
-            //         .map(function (d) { return projection([d.lon, d.lat]); })
-            //         .filter(function (d) { return !!d; });
 
             var labels = [],
                 vectors = [];
@@ -100,9 +97,30 @@
                     .domain([0, d3.max(_.values(ratios))])
                     .range([2, 20]);
 
+            var base_positions = _.map(
+                military_bases.getElementsByTagName("Placemark"), function (d) {
+                    var point = _.find(d.children, 
+                                       function (node) { 
+                                           return node.nodeName == "Point"; 
+                                       }).textContent.split(",");
+                    
+                    return projection([Number(point[0]), Number(point[1])]);
+                })
+                    .filter(function (d) { return !!d; });
+            
+            svg.append("g")
+                .selectAll("path")
+                .data(base_positions)
+                .enter()
+                .append("path")
+                .attr("d", d3.svg.symbol().type("cross").size(32))
+                .attr("class", "base")
+                .attr("transform", function (d) {
+                    return "translate("+d[0]+","+d[1]+")";
+                });
+
             svg.append("g")
                 .selectAll("circle")
-                //.data(positions)
                 .data(clusters.centroids)
                 .enter()
                 .append("circle")
@@ -112,6 +130,7 @@
                     r: function (d, i) { return R(ratios[i]); },
                     class: "point"
                 });
+
         });
 
 })();
