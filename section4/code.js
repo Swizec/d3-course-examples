@@ -103,6 +103,17 @@
                                        function (node) { 
                                            return node.nodeName == "Point"; 
                                        }).textContent.split(",");
+
+                    var icon = _.find(d.children,
+                                      function (node) {
+                                          return node.nodeName == "Style";
+                                      });
+                    if (icon.innerHTML.indexOf("force-icons.png") < 1
+                       && icon.innerHTML.indexOf("navy-icons.png") < 1) {
+                        return null;
+                    }
+                    //console.log(icon.innerHTML);
+                    //http://militarybases.com/images/icons/force-icons.png
                     
                     return projection([Number(point[0]), Number(point[1])]);
                 })

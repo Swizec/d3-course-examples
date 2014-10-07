@@ -22,10 +22,10 @@ text {
 }
 
 .base {
-    fill: none;
+    fill: white;
     stroke: #5667CC;
     stroke-width: 1px;
-    opacity: .8;
+    opacity: .9;
 }
 
 .q0-9-blue { fill:rgb(247,251,255); }
