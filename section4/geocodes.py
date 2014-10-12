@@ -1,14 +1,6 @@
 
 import csv, gmaps, geopy
-#from geocode import latlon, NoResultError
-#from gmaps import Geocoding
-#from omgeo import Geocoder
 from geopy.geocoders import Bing
-
-#maps = Geocoding(api_key="AIzaSyB9lcJWc0pHQk89WF_MJ6OcyttOqx0t4LE")
-#maps = Geocoding(api_key="AIzaSyBfpW7AtJNiLd1xCY6_Vh5Q7BS2d9wARgA")
-#bing = omgeo.services.Bing(settings={"api_key": "AtvTgjJ5FOjkgB5I291TXiDZFVZ7XK2_o4mqIBekDtcg0tDSBqmJpfjJckYqd2la"})
-#geocoder = Geocoder(sources=[['bing', {}],])
 
 bing = Bing("AtvTgjJ5FOjkgB5I291TXiDZFVZ7XK2_o4mqIBekDtcg0tDSBqmJpfjJckYqd2la",
             timeout=20)
@@ -48,13 +40,6 @@ def fetch():
                     print row
 
                     writer.writerow(row)
-                # try:
-                #     row += [v for (k, v) in
-                #             maps.geocode(row[1])[0]['geometry']['location'].items()]
-                #     print row
-                #     writer.writerow(row)
-                # except gmaps.errors.NoResults:
-                #     pass
 
 if __name__ == "__main__":
     fetch()
