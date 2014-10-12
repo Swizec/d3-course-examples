@@ -53,36 +53,11 @@
                 .attr("class", "borders")
                 .attr("d", path);
 
-            var labels = [],
-                vectors = [];
+            var tmp = clustered_ufos(_ufos, projection),
+                clustered = tmp[0],
+                clusters = tmp[1],
 
-            _ufos
-                .map(function (d) { return {
-                    label: [d.city, d.state].join(", "),
-                    vector: projection([d.lon, d.lat])}; })
-                .filter(function (d) { return !!d.vector; })
-                .forEach(function (d) {
-                    labels.push(d.label);
-                    vectors.push(d.vector);
-                });
-            
-
-            var clusters = figue.kmeans(120, vectors);
-            var clustered = _.groupBy(clusters.assignments.map(function (cluster, i) {
-                return {label: labels[i],
-                        cluster: cluster};
-            }), "cluster"),
-                cluster_populations = _.mapValues(clustered, function (cluster) {
-                    var populations = cluster.map(function (d) {
-                        return {city: d.label.toLowerCase(),
-                                population: city_populations[d.label.toLowerCase()] || 0};
-                    });
-                    
-                    return _.uniq(populations, function (d) { return d.city; })
-                        .reduce(function (sum, d) {
-                            return sum+Number(d.population);
-                        }, 0);
-                }),
+                cluster_populations = prepare.cluster_populations(clustered, city_populations),
                 ratios = _.mapValues(clustered,
                                      function (group, key) {
                                          var population = cluster_populations[key];
@@ -97,27 +72,7 @@
                     .domain([0, d3.max(_.values(ratios))])
                     .range([2, 20]);
 
-            var base_positions = _.map(
-                military_bases.getElementsByTagName("Placemark"), function (d) {
-                    var point = _.find(d.children, 
-                                       function (node) { 
-                                           return node.nodeName == "Point"; 
-                                       }).textContent.split(",");
-
-                    var icon = _.find(d.children,
-                                      function (node) {
-                                          return node.nodeName == "Style";
-                                      });
-                    if (icon.innerHTML.indexOf("force-icons.png") < 1
-                       && icon.innerHTML.indexOf("navy-icons.png") < 1) {
-                        return null;
-                    }
-                    //console.log(icon.innerHTML);
-                    //http://militarybases.com/images/icons/force-icons.png
-                    
-                    return projection([Number(point[0]), Number(point[1])]);
-                })
-                    .filter(function (d) { return !!d; });
+            var base_positions = prepare.base_positions(military_bases, projection);
             
             svg.append("g")
                 .selectAll("path")
