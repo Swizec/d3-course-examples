@@ -8,7 +8,7 @@
             .scale(1280)
             .translate([width / 2, height / 2]),
         geo_path = d3.geo.path()
-            .projection(projection);
+            .projection(geo_projection);
 
     var svg = d3.select("#graph").append("svg")
             .attr("width", width)
@@ -25,6 +25,7 @@
             _ufos = prepare.filter_ufos(_ufos);
             var ufos = prepare.ufos(_ufos);
             populations = prepare.populations(populations);
+            var states = prepare.states(states_hash);
 
             
             var tmp = clustered_ufos(_ufos, geo_projection),
@@ -35,8 +36,9 @@
 
             var drawers = Drawers(svg, ufos, populations);
 
-            drawers.map(US, geo_path);
+            drawers.map(US, geo_path, states);
             drawers.bases(military_bases, geo_projection);
+            
             drawers.centroids(clusters, clustered, cluster_populations);
 
         });
