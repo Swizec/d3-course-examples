@@ -4,10 +4,10 @@
     var width = 960,
         height = 600;
 
-    var projection = d3.geo.albersUsa()
+    var geo_projection = d3.geo.albersUsa()
             .scale(1280)
             .translate([width / 2, height / 2]),
-        path = d3.geo.path()
+        geo_path = d3.geo.path()
             .projection(projection);
 
     var svg = d3.select("#graph").append("svg")
@@ -25,35 +25,12 @@
             _ufos = prepare.filter_ufos(_ufos);
             var ufos = prepare.ufos(_ufos);
             populations = prepare.populations(populations);
-            states = prepare.states(states_hash);
 
-            var ufoCounts = _.mapValues(ufos, function (ufos, state) {
-                return ufos.length/populations.get(states.get(state))[2010];
-            });
+            var drawers = Drawers(svg, ufos, populations);
 
-            var quantize = d3.scale.quantize()
-                    .domain(d3.extent(_.values(ufoCounts)))
-                    .range(d3.range(9).map(function(i) { return "q" + i + "-9-green"; }));
+            drawers.map(US, geo_path);
 
-            var states = svg.append("g")
-                    .attr("class", "states")
-                    .selectAll("path")
-                    .data(topojson.feature(US, US.objects.states).features)
-                    .enter();
-
-            states.append("path")
-                .attr("d", path)
-                .attr("class", function(d) { 
-                    return quantize(ufoCounts[stateIdMap.get(d.id)]); 
-                });
-            
-            svg.append("path")
-                .datum(topojson.mesh(US, US.objects.states, 
-                                     function(a, b) { return a !== b; }))
-                .attr("class", "borders")
-                .attr("d", path);
-
-            var tmp = clustered_ufos(_ufos, projection),
+            var tmp = clustered_ufos(_ufos, geo_projection),
                 clustered = tmp[0],
                 clusters = tmp[1],
 
@@ -74,7 +51,7 @@
                     .domain([0, d3.max(_.values(ratios))])
                     .range([2, 20]);
 
-            var base_positions = prepare.base_positions(military_bases, projection);
+            var base_positions = prepare.base_positions(military_bases, geo_projection);
             
             svg.append("g")
                 .selectAll("path")
