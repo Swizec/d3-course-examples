@@ -57,7 +57,9 @@
                 clustered = tmp[0],
                 clusters = tmp[1],
 
-                cluster_populations = prepare.cluster_populations(clustered, city_populations),
+                cluster_populations = prepare.cluster_populations(clustered, city_populations);
+
+            var
                 ratios = _.mapValues(clustered,
                                      function (group, key) {
                                          var population = cluster_populations[key];
