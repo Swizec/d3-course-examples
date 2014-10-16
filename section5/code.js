@@ -28,18 +28,21 @@
             var states = prepare.states(states_hash);
 
             
-            var tmp = clustered_ufos(_ufos, geo_projection),
-                clustered = tmp[0],
-                clusters = tmp[1],
+            console.log(prepare.ufos_by_week(_ufos));
+            
+            
+            // var tmp = clustered_ufos(_ufos, geo_projection),
+            //     clustered = tmp[0],
+            //     clusters = tmp[1],
 
-                cluster_populations = prepare.cluster_populations(clustered, city_populations);
+            //     cluster_populations = prepare.cluster_populations(clustered, city_populations);
 
             var drawers = Drawers(svg, ufos, populations);
 
             drawers.map(US, geo_path, states);
             drawers.bases(military_bases, geo_projection);
             
-            drawers.centroids(clusters, clustered, cluster_populations);
+            //drawers.centroids(clusters, clustered, cluster_populations);
 
         });
 

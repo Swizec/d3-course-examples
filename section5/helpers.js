@@ -67,6 +67,23 @@ var prepare = {
                          function (ufo) { return ufo.state; });
     },
 
+    ufos_by_year: function (ufos) {
+        var format = d3.time.format("%m/%d/%Y %H:%M");
+        return _.groupBy(ufos,
+                         function (ufo) {
+                             return format.parse(ufo.time).getFullYear();
+                         });
+    },
+
+    ufos_by_week: function (ufos) {
+        var format = d3.time.format("%m/%d/%Y %H:%M");
+        return _.groupBy(ufos,
+                         function (ufo) {
+                             var d = moment(format.parse(ufo.time));
+                             return d.year()+'-'+d.week();
+                         });
+    },
+
     states: function (states) {
         return d3.map(_.mapValues(states,
                                   function (s) { return s.toLowerCase(); }));
