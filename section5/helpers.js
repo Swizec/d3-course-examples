@@ -84,6 +84,25 @@ var prepare = {
                          });
     },
 
+    ufos_by_season: function (ufos) {
+        var format = d3.time.format("%m/%d/%Y %H:%M"),
+            seasons = seasons = d3.scale.ordinal()
+                .domain(d3.range(12))
+                .range(["winter", "winter", 
+                        "spring", "spring", "spring", 
+                        "summer", "summer", "summer", 
+                        "autumn", "autumn", "autumn", 
+                        "winter"]);
+
+        return _.groupBy(ufos,
+                         function (ufo) {
+                             var d = format.parse(ufo.time),
+                                 year = d.getMonth() == 11 ? d.getFullYear()+1 : d.getFullYear();
+                             
+                             return year+"-"+seasons(d.getMonth());
+                         });
+    },
+
     states: function (states) {
         return d3.map(_.mapValues(states,
                                   function (s) { return s.toLowerCase(); }));
