@@ -61,7 +61,9 @@
                 d3.select("h1.season")
                     .html([season, year].join(" "));
 
-                drawers.place_ufos(ufos_by_season[[year, season].join("-")]);
+                requestAnimationFrame(function () {
+                    drawers.place_ufos(ufos_by_season[[year, season].join("-")]);
+                });
 
                 if (step%4 == 3) {
                     year += 1;

@@ -96,19 +96,30 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                         cx: function (d) { return d[0]; },
                         cy: function (d) { return d[1]; },
                         r: 2,
-                        class: "point"
+                        class: function (d, i) { return "point i-"+i; }
                     })
                     .style("visibility", "hidden");
 
-            d3.timer((function (i) {
-                return function () {
-                    d3.select(circles[0][i++])
-                        .style("visibility", "visible")
-                        .transition()
-                        .duration(800)
-                        .style("opacity", 0);
+            d3.timer((function (counter) {
+                var fps = 1000/60,
+                    per_frame = Math.ceil(circles.size() > fps 
+                                          ? circles.size()/fps 
+                                          : 1);
 
-                    return i >= circles.size();
+                return function () {
+                    var selector = d3.range(per_frame)
+                            .map(function (i) { return ".i-"+i; })
+                            .join(", ");
+
+                    var now = circles.filter(selector)
+                            .style("visibility", "visible")
+                            .transition()
+                            .duration(800)
+                            .style("opacity", .3);
+
+                    counter += now.size();
+
+                    return counter >= circles.size();
                 };
             })(0));
         }
