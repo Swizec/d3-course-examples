@@ -79,21 +79,35 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
         place_ufos: function (ufos) {
             if (!ufos) return;
 
-            var positions = ufos.map(function (ufo) {
-                return geo_projection([Number(ufo.lon), Number(ufo.lat)]);
-            }).filter(function (pos) { return !!pos; });
+            var format = d3.time.format("%m/%d/%Y %H:%M");
 
-            svg.append("g")
-                .selectAll("circle")
-                .data(positions)
-                .enter()
-                .append("circle")
-                .attr({
-                    cx: function (d) { return d[0]; },
-                    cy: function (d) { return d[1]; },
-                    r: 2,
-                    class: "point"
-                });
+            var positions = _.sortBy(ufos, function (ufo) { return format.parse(ufo.time); })
+                    .map(function (ufo) {
+                        return geo_projection([Number(ufo.lon), Number(ufo.lat)]);
+                    })
+                    .filter(function (pos) { return !!pos; });
+
+            var circles = svg.append("g")
+                    .selectAll("circle")
+                    .data(positions)
+                    .enter()
+                    .append("circle")
+                    .attr({
+                        cx: function (d) { return d[0]; },
+                        cy: function (d) { return d[1]; },
+                        r: 2,
+                        class: "point"
+                    })
+                    .style("visibility", "hidden");
+
+            d3.timer((function (i) {
+                return function () {
+                    d3.select(circles[0][i++])
+                        .style("visibility", "visible");
+
+                    return i >= circles.size();
+                };
+            })(0));
         }
     };
 };
