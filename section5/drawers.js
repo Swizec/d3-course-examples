@@ -103,7 +103,10 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
             d3.timer((function (i) {
                 return function () {
                     d3.select(circles[0][i++])
-                        .style("visibility", "visible");
+                        .style("visibility", "visible")
+                        .transition()
+                        .duration(800)
+                        .style("opacity", 0);
 
                     return i >= circles.size();
                 };
