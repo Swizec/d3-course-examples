@@ -100,28 +100,34 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                     })
                     .style("visibility", "hidden");
 
-            d3.timer((function (counter) {
-                var fps = 1000/60,
-                    per_frame = Math.ceil(circles.size() > fps 
-                                          ? circles.size()/fps 
-                                          : 1);
+            var fps = 1000/60,
+                per_frame = Math.ceil(circles.size() > fps 
+                                      ? circles.size()/fps 
+                                      : 1);
+
+            d3.timer((function () {
+                var counter = 0,
+                    previous = (new Date()).getTime();
 
                 return function () {
-                    var selector = d3.range(per_frame)
+                    var now = new Date().getTime(),
+                        delta = now-previous,
+                        frames = Math.ceil(delta/(1000/fps)),
+                        selector = d3.range(per_frame*frames)
                             .map(function (i) { return ".i-"+i; })
                             .join(", ");
 
-                    var now = circles.filter(selector)
+                    var drawn = circles.filter(selector)
                             .style("visibility", "visible")
                             .transition()
                             .duration(800)
                             .style("opacity", .3);
 
-                    counter += now.size();
+                    counter += drawn.size();
 
                     return counter >= circles.size();
                 };
-            })(0));
+            })());
         }
     };
 };
