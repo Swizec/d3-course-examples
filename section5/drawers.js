@@ -1,5 +1,5 @@
 
-var Drawers = function (svg, ufos, populations) {
+var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
 
     return {
 
@@ -74,6 +74,26 @@ var Drawers = function (svg, ufos, populations) {
                     class: "point"
                 });
 
+        },
+
+        place_ufos: function (ufos) {
+            if (!ufos) return;
+
+            var positions = ufos.map(function (ufo) {
+                return geo_projection([Number(ufo.lon), Number(ufo.lat)]);
+            }).filter(function (pos) { return !!pos; });
+
+            svg.append("g")
+                .selectAll("circle")
+                .data(positions)
+                .enter()
+                .append("circle")
+                .attr({
+                    cx: function (d) { return d[0]; },
+                    cy: function (d) { return d[1]; },
+                    r: 2,
+                    class: "point"
+                });
         }
     };
 };

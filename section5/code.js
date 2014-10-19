@@ -34,7 +34,7 @@
 
             //     cluster_populations = prepare.cluster_populations(clustered, city_populations);
 
-            var drawers = Drawers(svg, ufos, populations);
+            var drawers = Drawers(svg, ufos, populations, geo_path, geo_projection);
 
             drawers.map(US, geo_path, states);
             drawers.bases(military_bases, geo_projection);
@@ -42,17 +42,13 @@
             //drawers.centroids(clusters, clustered, cluster_populations);
             var ufos_by_season = prepare.ufos_by_season(_ufos),
                 seasons = seasons = d3.scale.ordinal()
-                    .domain(d3.range(12))
-                    .range(["winter", "winter", 
-                            "spring", "spring", "spring", 
-                            "summer", "summer", "summer", 
-                            "autumn", "autumn", "autumn", 
-                            "winter"]);
-            
+                    .domain(d3.range(4))
+                    .range(["winter", "spring", "summer", "autumn"]);
+
             var
                 stepper = setInterval((function () {
                     var step = 0,
-                        year = 1917;
+                        year = 1945;
                     return function () {
                         year = timeline_step(step++, year);
                     };
@@ -61,14 +57,17 @@
 
             function timeline_step (step, year) {
                 var season = seasons(step%12);
-                
-                if (step%12 == 11) {
+
+                d3.select("h1.season")
+                    .html([season, year].join(" "));
+
+                drawers.place_ufos(ufos_by_season[[year, season].join("-")]);
+
+                if (step%4 == 3) {
                     year += 1;
                 }
 
-                console.log(step, year, season);
-
-                if (year > 1945) {
+                if (year > 2014) {
                     clearInterval(stepper);
                 }
 
