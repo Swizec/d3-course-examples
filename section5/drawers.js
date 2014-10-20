@@ -87,45 +87,41 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                     })
                     .filter(function (pos) { return !!pos; });
 
-            var circles = svg.append("g")
-                    .selectAll("circle")
-                    .data(positions)
-                    .enter()
-                    .append("circle")
-                    .attr({
-                        cx: function (d) { return d[0]; },
-                        cy: function (d) { return d[1]; },
-                        r: 2,
-                        class: function (d, i) { return "point i-"+i; }
-                    })
-                    .style("visibility", "hidden");
-
             var fps = 1000/60,
-                per_frame = Math.ceil(circles.size() > fps 
-                                      ? circles.size()/fps 
-                                      : 1);
+                per_frame = Math.ceil(positions.length > fps 
+                                      ? positions.length/fps 
+                                      : 1),
+                all_ufos = positions.length;
 
             d3.timer((function () {
                 var counter = 0,
                     previous = (new Date()).getTime();
 
-                return function () {
+                return function draw () {
                     var now = new Date().getTime(),
                         delta = now-previous,
-                        frames = Math.ceil(delta/(1000/fps)),
-                        selector = d3.range(per_frame*frames)
-                            .map(function (i) { return ".i-"+i; })
-                            .join(", ");
+                        frames = Math.ceil(delta/(1000/fps));
 
-                    var drawn = circles.filter(selector)
-                            .style("visibility", "visible")
-                            .transition()
-                            .duration(800)
-                            .style("opacity", .3);
+                    var g = svg.append("g"),
+                        drawn = g.selectAll("circle")
+                            .data(positions.splice(0, per_frame*frames))
+                            .enter()
+                            .append("circle")
+                            .attr({
+                                cx: function (d) { return d[0]; },
+                                cy: function (d) { return d[1]; },
+                                r: 2,
+                                class: "point"
+                            });
 
-                    counter += drawn.size();
+                    g.transition()
+                        .duration(800)
+                        .style("opacity", .3);
 
-                    return counter >= circles.size();
+
+                    counter += drawn.size();;
+
+                    return counter >= all_ufos;
                 };
             })());
         }
