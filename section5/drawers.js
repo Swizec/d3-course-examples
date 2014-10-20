@@ -119,7 +119,8 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                         .style("opacity", .3);
 
 
-                    counter += drawn.size();;
+                    counter += drawn.size();
+                    previous = now;
 
                     return counter >= all_ufos;
                 };
