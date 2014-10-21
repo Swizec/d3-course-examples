@@ -71,7 +71,8 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                     cx: function (d) { return d[0]; },
                     cy: function (d) { return d[1]; },
                     r: function (d, i) { return R(ratios[i]); },
-                    class: "point"
+                    class: "centroid",
+                    id: function (d, i) { return "centroid-"+i; }
                 });
 
         },

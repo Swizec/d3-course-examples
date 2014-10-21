@@ -28,18 +28,19 @@
             var states = prepare.states(states_hash);
             
             
-            // var tmp = clustered_ufos(_ufos, geo_projection),
-            //     clustered = tmp[0],
-            //     clusters = tmp[1],
+            var tmp = clustered_ufos(_ufos, geo_projection),
+                clustered = tmp[0],
+                clusters = tmp[1],
 
-            //     cluster_populations = prepare.cluster_populations(clustered, city_populations);
+                cluster_populations = prepare.cluster_populations(clustered, city_populations);
 
             var drawers = Drawers(svg, ufos, populations, geo_path, geo_projection);
 
             drawers.map(US, geo_path, states);
             drawers.bases(military_bases, geo_projection);
             
-            //drawers.centroids(clusters, clustered, cluster_populations);
+            drawers.centroids(clusters, clustered, cluster_populations);
+
             var ufos_by_season = prepare.ufos_by_season(_ufos),
                 seasons = seasons = d3.scale.ordinal()
                     .domain(d3.range(4))
