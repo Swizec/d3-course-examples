@@ -61,6 +61,14 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                 R = d3.scale.linear()
                     .domain([0, d3.max(_.values(ratios))])
                     .range([2, 20]);
+
+            centroids = centroids.map(function (pos, i) {
+                return {x: pos[0],
+                        y: pos[1],
+                        max_R: R(ratios[i]),
+                        all: clustered[i].length,
+                        count: 0};
+            });
             
             svg.append("g")
                 .selectAll("circle")
@@ -68,9 +76,10 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                 .enter()
                 .append("circle")
                 .attr({
-                    cx: function (d) { return d[0]; },
-                    cy: function (d) { return d[1]; },
-                    r: function (d, i) { return R(ratios[i]); },
+                    cx: function (d) { return d.x; },
+                    cy: function (d) { return d.y; },
+                    //r: function (d, i) { return R(ratios[i]); },
+                    r: 0,
                     class: "centroid",
                     id: function (d, i) { return "centroid-"+i; }
                 });
@@ -130,9 +139,20 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                         .duration(500)
                         .style("opacity", .3);
 
+                    centroids.each(function (d) {
+                        d.count += 1;
+                        d3.select(this).datum(d);
+                    });
+
                     centroids.transition()
                         .duration(500)
-                        .attr("r", function (d) { console.log(d); return 10; });
+                        .attr("r", function (d) {
+                            //console.log("new R", (d.count/d.all)*d.max_R);
+                            //console.log(d);
+                            return (d.count/d.all)*d.max_R;
+                            return 10;
+                        })
+                        .ease(d3.ease('elastic-in'));
 
 
                     counter += drawn.size();
