@@ -46,7 +46,7 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                 });
         },
 
-        centroids: function (clusters, clustered, cluster_populations) {
+        centroids: function (centroids, clustered, cluster_populations) {
             var
                 ratios = _.mapValues(clustered,
                                      function (group, key) {
@@ -64,7 +64,7 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
             
             svg.append("g")
                 .selectAll("circle")
-                .data(clusters.centroids)
+                .data(centroids)
                 .enter()
                 .append("circle")
                 .attr({
@@ -82,7 +82,9 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
 
             var format = d3.time.format("%m/%d/%Y %H:%M");
 
-            var positions = _.sortBy(ufos, function (ufo) { return format.parse(ufo.time); })
+            ufos = _.sortBy(ufos, function (ufo) { return format.parse(ufo.time); });
+
+            var positions = ufos
                     .map(function (ufo) {
                         return geo_projection([Number(ufo.lon), Number(ufo.lat)]);
                     })
@@ -103,9 +105,15 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                         delta = now-previous,
                         frames = Math.ceil(delta/(1000/fps));
 
+                    var to_draw = {
+                        pos: positions.splice(0, per_frame*frames),
+                        ufos: ufos.splice(0, per_frame*frames)
+                    };
+                        
+
                     var g = svg.append("g"),
                         drawn = g.selectAll("circle")
-                            .data(positions.splice(0, per_frame*frames))
+                            .data(to_draw.pos)
                             .enter()
                             .append("circle")
                             .attr({
@@ -113,11 +121,18 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                                 cy: function (d) { return d[1]; },
                                 r: 2,
                                 class: "point"
-                            });
-
+                            }),
+                        centroids = d3.select(to_draw.ufos.map(function (ufo) {
+                            return "#centroid-"+ufo.cluster;
+                        }).join(", "));
+                                                               
                     g.transition()
-                        .duration(800)
+                        .duration(500)
                         .style("opacity", .3);
+
+                    centroids.transition()
+                        .duration(500)
+                        .attr("r", function (d) { console.log(d); return 10; });
 
 
                     counter += drawn.size();

@@ -29,8 +29,8 @@
             
             
             var tmp = clustered_ufos(_ufos, geo_projection),
-                clustered = tmp[0],
-                clusters = tmp[1],
+                clustered = tmp[0], // cluster -> ufos
+                clusters = tmp[1], // centroids, assignments
 
                 cluster_populations = prepare.cluster_populations(clustered, city_populations);
 
@@ -39,9 +39,9 @@
             drawers.map(US, geo_path, states);
             drawers.bases(military_bases, geo_projection);
             
-            drawers.centroids(clusters, clustered, cluster_populations);
+            drawers.centroids(clusters.centroids, clustered, cluster_populations);
 
-            var ufos_by_season = prepare.ufos_by_season(_ufos),
+            var ufos_by_season = prepare.ufos_by_season(_ufos, clusters.assignments),
                 seasons = seasons = d3.scale.ordinal()
                     .domain(d3.range(4))
                     .range(["winter", "spring", "summer", "autumn"]);
@@ -54,7 +54,6 @@
                         year = timeline_step(step++, year);
                     };
                 })(), 1000);
-
 
             function timeline_step (step, year) {
                 var season = seasons(step%12);
