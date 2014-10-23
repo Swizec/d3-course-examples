@@ -62,11 +62,18 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                     .domain([0, d3.max(_.values(ratios))])
                     .range([2, 20]);
 
+            var ufo_count = _.values(clustered)
+                    .reduce(function (sum, group) {
+                        return sum+group.length;
+                    }, 0);
+
             centroids = centroids.map(function (pos, i) {
                 return {x: pos[0],
                         y: pos[1],
                         max_R: R(ratios[i]),
-                        all: clustered[i].length,
+                        all_here: clustered[i].length,
+                        abs_all: ufo_count,
+                        population: cluster_populations[i],
                         count: 0};
             });
             
@@ -103,7 +110,7 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                 per_frame = Math.ceil(positions.length > fps 
                                       ? positions.length/fps 
                                       : 1),
-                all_ufos = positions.length;
+                ufos_in_batch = positions.length;
 
             d3.timer((function () {
                 var counter = 0,
@@ -131,7 +138,7 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                                 r: 2,
                                 class: "point"
                             }),
-                        centroids = d3.select(to_draw.ufos.map(function (ufo) {
+                        centroids = d3.selectAll(to_draw.ufos.map(function (ufo) {
                             return "#centroid-"+ufo.cluster;
                         }).join(", "));
                                                                
@@ -144,13 +151,36 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                         d3.select(this).datum(d);
                     });
 
-                    centroids.transition()
+                    var ratios = [],
+                        currently_drawn = 0;
+
+                    d3.selectAll(".centroid")
+                        .each(function (d) {
+                            currently_drawn += d.count;
+                        })
+                        .each(function (d) {
+                            if (d.population > 0) {
+                                ratios.push(d.count/currently_drawn);
+                            }else{
+                                ratios.push(0);
+                            }
+                        });
+
+                    var R = d3.scale.linear()
+                            .domain([0, d3.max(ratios)])
+                            .range([0, 20]);
+
+                    d3.selectAll(".centroid")
+                        .transition()
                         .duration(500)
                         .attr("r", function (d) {
-                            //console.log("new R", (d.count/d.all)*d.max_R);
+                            return R(d.count/currently_drawn);
+                            //console.log(d.count/currently_drawn, d.population);
+                            //console.log("new R", d.count, d.all, (d.count/d.all)*d.max_R);
                             //console.log(d);
-                            return (d.count/d.all)*d.max_R;
-                            return 10;
+                            //return R(d.count);
+                            //return 1;
+                            //return (d.count/d.all)*d.max_R;
                         })
                         .ease(d3.ease('elastic-in'));
 
@@ -158,7 +188,7 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                     counter += drawn.size();
                     previous = now;
 
-                    return counter >= all_ufos;
+                    return counter >= ufos_in_batch;
                 };
             })());
         }
