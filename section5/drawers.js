@@ -160,7 +160,7 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                         })
                         .each(function (d) {
                             if (d.population > 0) {
-                                ratios.push(d.count/currently_drawn);
+                                ratios.push((d.count/currently_drawn)/d.population);
                             }else{
                                 ratios.push(0);
                             }
@@ -174,7 +174,10 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                         .transition()
                         .duration(500)
                         .attr("r", function (d) {
-                            return R(d.count/currently_drawn);
+                            if (d.population < 1) {
+                                return 0;
+                            }
+                            return R((d.count/currently_drawn)/d.population);
                             //console.log(d.count/currently_drawn, d.population);
                             //console.log("new R", d.count, d.all, (d.count/d.all)*d.max_R);
                             //console.log(d);
