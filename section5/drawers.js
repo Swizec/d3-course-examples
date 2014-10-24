@@ -78,6 +78,8 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
             });
             
             svg.append("g")
+                .attr("class", "centroids")
+                .datum({type: "centroids"})
                 .selectAll("circle")
                 .data(centroids)
                 .enter()
@@ -127,7 +129,9 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                     };
                         
 
-                    var g = svg.append("g"),
+                    var g = svg.append("g")
+                            .attr("class", "points")
+                            .datum({type: "points"}),
                         drawn = g.selectAll("circle")
                             .data(to_draw.pos)
                             .enter()
@@ -154,7 +158,7 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                     var ratios = [],
                         currently_drawn = 0;
 
-                    d3.selectAll(".centroid")
+                    svg.selectAll(".centroid")
                         .each(function (d) {
                             currently_drawn += d.count;
                         })
@@ -170,7 +174,7 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                             .domain([0, d3.max(ratios)])
                             .range([0, 20]);
 
-                    d3.selectAll(".centroid")
+                    svg.selectAll(".centroid")
                         .transition()
                         .duration(500)
                         .attr("r", function (d) {
@@ -178,15 +182,14 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                                 return 0;
                             }
                             return R((d.count/d.population)/currently_drawn);
-                            //console.log(d.count/currently_drawn, d.population);
-                            //console.log("new R", d.count, d.all, (d.count/d.all)*d.max_R);
-                            //console.log(d);
-                            //return R(d.count);
-                            //return 1;
-                            //return (d.count/d.all)*d.max_R;
                         })
                         .ease(d3.ease('elastic-in'));
 
+                    svg.selectAll("g.centroids, g.points")
+                        .sort(function (a, b) {
+                            if (a.type == "centroids") return 1;
+                            return -1;
+                        });
 
                     counter += drawn.size();
                     previous = now;
