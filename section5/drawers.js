@@ -108,7 +108,7 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                     })
                     .filter(function (pos) { return !!pos; });
 
-            var fps = 1000/60,
+            var fps = 60,
                 per_frame = Math.ceil(positions.length > fps 
                                       ? positions.length/fps 
                                       : 1),
