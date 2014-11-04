@@ -55,6 +55,13 @@
                     };
                 })(), 1000);
 
+            var drag = d3.behavior.drag()
+                    .origin(function () { return {x: 0, y: 0}; })
+                    .on("drag", timeline_explore);
+
+            d3.select("h1.season")
+                .call(drag);
+
             function timeline_step (step, year) {
                 var season = seasons(step%12);
 
@@ -75,6 +82,10 @@
 
                 return year;
             };
+
+            function timeline_explore() {
+                console.log("draggin", d3.event.x, d3.event.y);
+            }
         });
 
 })();
