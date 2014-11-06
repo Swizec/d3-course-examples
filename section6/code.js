@@ -46,14 +46,15 @@
                     .domain(d3.range(4))
                     .range(["winter", "spring", "summer", "autumn"]);
 
-            var
-                stepper = setInterval((function () {
-                    var step = 0,
-                        year = 1945;
-                    return function () {
-                        year = timeline_step(step++, year);
-                    };
-                })(), 1000);
+            var make_step = (function () {
+                var step = 0,
+                    year = 1945;
+                return function (direction) {
+                    year = timeline_step(step, year);
+                    step += direction || 1;
+                };
+            })(),
+            stepper = setInterval(make_step, 1000);
 
             var drag = d3.behavior.drag()
                     .origin(function () { return {x: 0, y: 0}; })
@@ -84,7 +85,15 @@
             };
 
             function timeline_explore() {
-                console.log("draggin", d3.event.x, d3.event.y);
+                clearInterval(stepper);
+
+                if (d3.event.x < 0) {
+                    // back in time
+                    make_step(-1);
+                }else{
+                    // forward in time
+                    make_step(+1);
+                }
             }
         });
 
