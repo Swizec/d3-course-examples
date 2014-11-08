@@ -129,26 +129,26 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                     };
                         
 
-                    var g = svg.append("g")
-                            .attr("class", "points")
-                            .datum({type: "points"}),
-                        drawn = g.selectAll("circle")
-                            .data(to_draw.pos)
-                            .enter()
-                            .append("circle")
-                            .attr({
-                                cx: function (d) { return d[0]; },
-                                cy: function (d) { return d[1]; },
-                                r: 2,
-                                class: "point"
-                            }),
+                    var // g = svg.append("g")
+                        //     .attr("class", "points")
+                        //     .datum({type: "points"}),
+                        // drawn = g.selectAll("circle")
+                        //     .data(to_draw.pos)
+                        //     .enter()
+                        //     .append("circle")
+                        //     .attr({
+                        //         cx: function (d) { return d[0]; },
+                        //         cy: function (d) { return d[1]; },
+                        //         r: 2,
+                        //         class: "point"
+                        //     }),
                         centroids = d3.selectAll(to_draw.ufos.map(function (ufo) {
                             return "#centroid-"+ufo.cluster;
                         }).join(", "));
                                                                
-                    g.transition()
-                        .duration(500)
-                        .style("opacity", .3);
+                    // g.transition()
+                    //     .duration(500)
+                    //     .style("opacity", .3);
 
                     centroids.each(function (d) {
                         d.count += 1;
@@ -185,13 +185,13 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                         })
                         .ease(d3.ease('elastic-in'));
 
-                    svg.selectAll("g.centroids, g.points")
-                        .sort(function (a, b) {
-                            if (a.type == "centroids") return 1;
-                            return -1;
-                        });
+                    // svg.selectAll("g.centroids, g.points")
+                    //     .sort(function (a, b) {
+                    //         if (a.type == "centroids") return 1;
+                    //         return -1;
+                    //     });
 
-                    counter += drawn.size();
+                    counter += to_draw.pos.length;//drawn.size();
                     previous = now;
 
                     return counter >= ufos_in_batch;

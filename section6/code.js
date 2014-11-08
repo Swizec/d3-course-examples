@@ -50,8 +50,10 @@
                 var step = 0,
                     year = 1945;
                 return function (direction) {
-                    year = timeline_step(step, year);
-                    step += direction || 1;
+                    direction || (direction = 1);
+
+                    year = timeline_step(step, year, direction);
+                    step += direction;
                 };
             })(),
             stepper = setInterval(make_step, 1000);
@@ -63,7 +65,7 @@
             d3.select("h1.season")
                 .call(drag);
 
-            function timeline_step (step, year) {
+            function timeline_step (step, year, direction) {
                 var season = seasons(step%12);
 
                 d3.select("h1.season")
@@ -74,7 +76,7 @@
                 });
 
                 if (step%4 == 3) {
-                    year += 1;
+                    year += direction;
                 }
 
                 if (year > 2014) {
@@ -86,7 +88,6 @@
 
             function timeline_explore() {
                 clearInterval(stepper);
-
                 if (d3.event.x < 0) {
                     // back in time
                     make_step(-1);
