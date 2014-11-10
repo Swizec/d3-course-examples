@@ -55,8 +55,10 @@
                     year = timeline_step(step, year, direction);
                     step += direction;
                 };
-            })(),
-            stepper = setInterval(make_step, 1000);
+            })();
+            //stepper = setInterval(make_step, 1000);
+
+            make_step();
 
             var drag = d3.behavior.drag()
                     .origin(function () { return {x: 0, y: 0}; })
@@ -65,6 +67,11 @@
             d3.select("h1.season")
                 .call(drag);
 
+            d3.select("#down")
+                .on("click", function () { make_step(-1); });
+            d3.select("#up")
+                .on("click", function () { make_step(+1); });
+
             function timeline_step (step, year, direction) {
                 var season = seasons(step%12);
 
@@ -72,7 +79,13 @@
                     .html([season, year].join(" "));
 
                 requestAnimationFrame(function () {
-                    drawers.place_ufos(ufos_by_season[[year, season].join("-")]);
+                    var ufos_in_step = ufos_by_season[[year, season].join("-")];
+
+                    if (direction > 0) {
+                        drawers.place_ufos(ufos_in_step);
+                    }else{
+                        drawers.remove_ufos(ufos_in_step);
+                    }
                 });
 
                 if (step%4 == 3) {
@@ -87,7 +100,10 @@
             };
 
             function timeline_explore() {
-                clearInterval(stepper);
+                if (typeof stepper !== "undefined") {
+                    clearInterval(stepper);
+                }
+
                 if (d3.event.x < 0) {
                     // back in time
                     make_step(-1);
