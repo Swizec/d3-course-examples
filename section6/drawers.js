@@ -116,7 +116,7 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                                       : 1),
                 ufos_in_batch = positions.length;
 
-            console.log("ufos_in_batch", positions.length, positions);
+            console.log("ufos_in_batch", positions.length);
 
             // d3.timer((function () {
             //     var counter = 0,
@@ -253,7 +253,7 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                     }
                     return R((d.count/d.population)/currently_drawn);
                 })
-                .ease(d3.ease('elastic-in'));
+                .ease(d3.ease('elastic-out'));
         }
     };
 };

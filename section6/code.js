@@ -51,9 +51,48 @@
                     year = 1945;
                 return function (direction) {
                     direction || (direction = 1);
+                    if (step+direction < 0) return;
 
                     year = timeline_step(step, year, direction);
-                    step += direction;
+
+                    if (direction > 0) {
+                        update_caption(step, year);
+
+                        step += direction;
+                        
+                        if (step%4 == 0) {
+                            year += direction;
+                        }
+                    }else{
+                        step += direction;
+                        
+                        if (step%4 == 0) {
+                            year += direction;
+                        }
+
+                        update_caption(step, year);
+                    }
+                    
+                    // if (direction > 0) {
+                    //     alert("up");
+                    //     update_caption(step, year);
+                    //     //step += direction;
+
+                    //     if (step%4 == 0) {
+                    //         year += direction;
+                    //     }
+                    // }else{
+                    //     step += direction;
+                    //     if (step%4 == 0) {
+                    //         year += direction;
+                    //     }
+
+                    //     update_caption(step, year);
+                    // }
+
+                    // if (year > 2014) {
+                    //     clearInterval(stepper);
+                    // }
                 };
             })();
             //stepper = setInterval(make_step, 1000);
@@ -72,11 +111,15 @@
             d3.select("#up")
                 .on("click", function () { make_step(+1); });
 
-            function timeline_step (step, year, direction) {
+            function update_caption(step, year) {
                 var season = seasons(step%12);
 
                 d3.select("h1.season")
-                    .html([season, year].join(" "));
+                    .html([step+",", season, year].join(" "));
+            }
+
+            function timeline_step (step, year, direction) {
+                var season = seasons(step%12);
 
                 requestAnimationFrame(function () {
                     var ufos_in_step = ufos_by_season[[year, season].join("-")];
@@ -87,14 +130,6 @@
                         drawers.remove_ufos(ufos_in_step);
                     }
                 });
-
-                if (step%4 == 3) {
-                    year += direction;
-                }
-
-                if (year > 2014) {
-                    clearInterval(stepper);
-                }
 
                 return year;
             };
