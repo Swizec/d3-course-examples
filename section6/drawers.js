@@ -98,8 +98,6 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
         place_ufos: function (ufos) {
             if (!ufos) return;
 
-            console.log("drawing", ufos.length, ufos);
-
             var format = d3.time.format("%m/%d/%Y %H:%M");
 
             ufos = _.sortBy(ufos, function (ufo) { return format.parse(ufo.time); });
@@ -116,8 +114,6 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                                       : 1),
                 ufos_in_batch = positions.length;
 
-            console.log("ufos_in_batch", positions.length);
-
             // d3.timer((function () {
             //     var counter = 0,
             var         previous = (new Date()).getTime();
@@ -132,8 +128,12 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                         pos: positions.splice(0, per_frame*frames),
                         ufos: ufos.splice(0, per_frame*frames)
                     };
-                        
-                    console.log(to_draw);
+
+            var selector = to_draw.ufos.map(function (ufo) {
+                            return "#centroid-"+ufo.cluster;
+                        }).join(", ");
+
+            console.log("drawing", selector);
 
                     var // g = svg.append("g")
                         //     .attr("class", "points")
@@ -148,9 +148,7 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                         //         r: 2,
                         //         class: "point"
                         //     }),
-                        centroids = d3.selectAll(to_draw.ufos.map(function (ufo) {
-                            return "#centroid-"+ufo.cluster;
-                        }).join(", "));
+                        centroids = d3.selectAll(selector);
                                                                
                     // g.transition()
                     //     .duration(500)
@@ -200,9 +198,6 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                  //   counter += to_draw.pos.length;//drawn.size();
                  //   previous = now;
 
-                    //if (counter >= ufos_in_batch) {
-                        console.log("done drawing", "all:", currently_drawn, "now:", to_draw.pos.length);
-                    //}
 
 //                    return counter >= ufos_in_batch;
 //                };
@@ -212,11 +207,13 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
         remove_ufos: function (ufos) {
             if (!ufos) return;
 
-            console.log("removing", ufos.length);
-
-            var centroids = d3.selectAll(ufos.map(function (ufo) {
+            var selector = ufos.map(function (ufo) {
                 return "#centroid-"+ufo.cluster;
-            }).join(", "));
+            }).join(", ");
+
+            console.log("removing", selector);
+
+            var centroids = d3.selectAll(selector);
             
             centroids.each(function (d) {
                 d.count -= 1;
@@ -237,8 +234,6 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                         ratios.push(0);
                     }
                 });
-
-            console.log(currently_drawn);
 
             var R = d3.scale.linear()
                     .domain([0, d3.max(ratios)])

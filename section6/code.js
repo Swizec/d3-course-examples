@@ -72,27 +72,6 @@
 
                         update_caption(step, year);
                     }
-                    
-                    // if (direction > 0) {
-                    //     alert("up");
-                    //     update_caption(step, year);
-                    //     //step += direction;
-
-                    //     if (step%4 == 0) {
-                    //         year += direction;
-                    //     }
-                    // }else{
-                    //     step += direction;
-                    //     if (step%4 == 0) {
-                    //         year += direction;
-                    //     }
-
-                    //     update_caption(step, year);
-                    // }
-
-                    // if (year > 2014) {
-                    //     clearInterval(stepper);
-                    // }
                 };
             })();
             //stepper = setInterval(make_step, 1000);
@@ -120,6 +99,8 @@
 
             function timeline_step (step, year, direction) {
                 var season = seasons(step%12);
+
+                console.log("drawing for", step, year);
 
                 requestAnimationFrame(function () {
                     var ufos_in_step = ufos_by_season[[year, season].join("-")];
