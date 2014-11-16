@@ -46,6 +46,10 @@
                     .domain(d3.range(4))
                     .range(["winter", "spring", "summer", "autumn"]);
 
+            prepare.precalc_animation(ufos_by_season);
+            return;
+
+
             var make_step = (function () {
                 var step = 0,
                     year = 1945;

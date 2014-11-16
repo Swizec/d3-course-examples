@@ -157,6 +157,34 @@ var prepare = {
                 return projection([Number(point[0]), Number(point[1])]);
             })
             .filter(function (d) { return !!d; });
+    },
+
+    precalc_animation: function (ufos_by_season) {
+        var seasons = seasons = d3.scale.ordinal()
+                .range(d3.range(4))
+                .domain(["winter", "spring", "summer", "autumn"]),
+            start_year = 1945;
+
+        console.log(_.keys(ufos_by_season).sort(
+            function (a, b) {
+                a = a.split("-");
+                b = b.split("-");
+                
+                var order = d3.ascending(Number(a[0]),
+                                         Number(b[0]));
+                
+                if (order == 0) {
+                    order = d3.ascending(seasons(a[1]),
+                                         seasons(b[1]));
+                }
+                
+                return order;
+            })
+                    .filter(function (key) {
+                        key = key.split("-");
+                        return Number(key[0]) >= 1945;
+                    }));
+
     }
 };
 
