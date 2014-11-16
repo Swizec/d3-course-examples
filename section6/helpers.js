@@ -163,27 +163,53 @@ var prepare = {
         var seasons = seasons = d3.scale.ordinal()
                 .range(d3.range(4))
                 .domain(["winter", "spring", "summer", "autumn"]),
-            start_year = 1945;
+            start_year = 1945,
+            base_state = {};
 
-        console.log(_.keys(ufos_by_season).sort(
-            function (a, b) {
-                a = a.split("-");
-                b = b.split("-");
-                
-                var order = d3.ascending(Number(a[0]),
-                                         Number(b[0]));
-                
-                if (order == 0) {
-                    order = d3.ascending(seasons(a[1]),
-                                         seasons(b[1]));
-                }
-                
-                return order;
-            })
-                    .filter(function (key) {
-                        key = key.split("-");
-                        return Number(key[0]) >= 1945;
-                    }));
+        d3.range(120).forEach(function (cluster_id) {
+            base_state[cluster_id] = 0;
+        });
+
+        console.log(
+            _.keys(ufos_by_season)
+                .sort(function (a, b) {
+                    a = a.split("-");
+                    b = b.split("-");
+                    
+                    var order = d3.ascending(Number(a[0]),
+                                             Number(b[0]));
+                    
+                    if (order == 0) {
+                        order = d3.ascending(seasons(a[1]),
+                                             seasons(b[1]));
+                    }
+                    
+                    return order;
+                })
+                .filter(function (key) {
+                    key = key.split("-");
+                    return Number(key[0]) >= 1945;
+                })
+                .reduce(function (result, key, i) {
+                    
+                    var ufos = ufos_by_season[key],
+                        cluster_ids = ufos.map(function (ufo) {
+                            return ufo.cluster;
+                        });
+
+                    var sum = _.clone(result.sum);
+
+                    cluster_ids.forEach(function (id) {
+                        sum[id] += 1;
+                    });
+
+                    result.keyframes.push(sum);
+                    result.sum = sum;
+
+                    return result;
+                }, {keyframes: [],
+                    sum: base_state})
+        );
 
     }
 };
