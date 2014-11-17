@@ -249,6 +249,19 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                     return R((d.count/d.population)/currently_drawn);
                 })
                 .ease(d3.ease('elastic-out'));
+        },
+
+        draw_keyframe: function (keyframe) {
+            keyframe.forEach(function (d) {
+                svg.select("#centroid-"+d.id)
+                    //.transition()
+                    //.duration(500)
+                    .attr("r", d.R);// function () { 
+                    //     console.log(d.R, d);
+                    //     return d.R; 
+                    // });
+                    //.ease(d3.ease('elastic-in'));
+            });
         }
     };
 };

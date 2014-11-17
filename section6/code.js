@@ -46,12 +46,12 @@
                     .domain(d3.range(4))
                     .range(["winter", "spring", "summer", "autumn"]);
 
-            prepare.precalc_animation(ufos_by_season,
-                                      {centroids: clusters.centroids,
-                                       clustered: clustered,
-                                       populations: cluster_populations});
-            return;
-
+            var keyframes = prepare.precalc_animation(
+                ufos_by_season,
+                {centroids: clusters.centroids,
+                 clustered: clustered,
+                 populations: cluster_populations}
+            ).keyframes;
 
             var make_step = (function () {
                 var step = 0,
@@ -107,16 +107,15 @@
             function timeline_step (step, year, direction) {
                 var season = seasons(step%12);
 
-                console.log("drawing for", step, year);
-
                 requestAnimationFrame(function () {
-                    var ufos_in_step = ufos_by_season[[year, season].join("-")];
+                    drawers.draw_keyframe(keyframes[step]);
+                    //var ufos_in_step = ufos_by_season[[year, season].join("-")];
 
-                    if (direction > 0) {
-                        drawers.place_ufos(ufos_in_step);
-                    }else{
-                        drawers.remove_ufos(ufos_in_step);
-                    }
+                    // if (direction > 0) {
+                    //     drawers.place_ufos(ufos_in_step);
+                    // }else{
+                    //     drawers.remove_ufos(ufos_in_step);
+                    // }
                 });
 
                 return year;

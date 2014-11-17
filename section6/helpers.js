@@ -168,19 +168,17 @@ var prepare = {
                                                      centroids.clustered,
                                                      centroids.populations);
 
-        console.log(
-            _.keys(ufos_by_season)
-                .sort(
-                    _.curry(year_season_ordering)(seasons)
-                )
-                .filter(function (key) {
-                    key = key.split("-");
-                    return Number(key[0]) >= start_year;
-                })
-                .reduce(make_keyframe,
-                        {keyframes: [],
-                         sum: base_state})
-        );
+        return _.keys(ufos_by_season)
+            .sort(
+                _.curry(year_season_ordering)(seasons)
+            )
+            .filter(function (key) {
+                key = key.split("-");
+                return Number(key[0]) >= start_year;
+            })
+            .reduce(make_keyframe,
+                    {keyframes: [],
+                     sum: base_state});
 
         function make_keyframe (result, key, i) {           
             var ufos = ufos_by_season[key],
@@ -239,7 +237,8 @@ var prepare = {
                     population: cluster_populations[i],
                     count: 0,
                     R_scale: R,
-                    R: 0};
+                    R: 0,
+                    id: i};
         });
     }
 };
