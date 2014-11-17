@@ -46,7 +46,10 @@
                     .domain(d3.range(4))
                     .range(["winter", "spring", "summer", "autumn"]);
 
-            prepare.precalc_animation(ufos_by_season);
+            prepare.precalc_animation(ufos_by_season,
+                                      {centroids: clusters.centroids,
+                                       clustered: clustered,
+                                       populations: cluster_populations});
             return;
 
 

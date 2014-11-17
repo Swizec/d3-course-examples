@@ -159,16 +159,14 @@ var prepare = {
             .filter(function (d) { return !!d; });
     },
 
-    precalc_animation: function (ufos_by_season) {
+    precalc_animation: function (ufos_by_season, centroids) {
         var seasons = seasons = d3.scale.ordinal()
                 .range(d3.range(4))
                 .domain(["winter", "spring", "summer", "autumn"]),
             start_year = 1945,
-            base_state = {};
-
-        d3.range(120).forEach(function (cluster_id) {
-            base_state[cluster_id] = 0;
-        });
+            base_state = prepare.centroid_base_state(centroids.centroids,
+                                                     centroids.clustered,
+                                                     centroids.populations);
 
         console.log(
             _.keys(ufos_by_season)
@@ -188,12 +186,21 @@ var prepare = {
             var ufos = ufos_by_season[key],
                 cluster_ids = ufos.map(function (ufo) {
                     return ufo.cluster;
-                });
+                }).filter(function (id) { return typeof id != "undefined"; });
             
-            var sum = _.clone(result.sum);
-            
+            var sum = _.cloneDeep(result.sum);
+
+            var currently_drawn = d3.sum(
+                _.values(sum).map(function (d) { return d.count; })
+            )+cluster_ids.length;
+
             cluster_ids.forEach(function (id) {
-                sum[id] += 1;
+                var d = sum[id];
+
+                d.count += 1;
+                d.R = d.R_scale((d.count/d.population)/currently_drawn);
+
+                sum[id] = d;
             });
             
             result.keyframes.push(sum);
@@ -201,6 +208,39 @@ var prepare = {
             
             return result;
         }
+    },
+
+    centroid_base_state: function (centroids, clustered, cluster_populations) {
+        var ratios = _.mapValues(clustered,
+                                 function (group, key) {
+                                     var population = cluster_populations[key];
+                                     
+                                     if (population == 0) {
+                                         return 0;
+                                     }
+                                     
+                                     return group.length/population;
+                                 }),
+            R = d3.scale.linear()
+                .domain([0, d3.max(_.values(ratios))])
+                .range([2, 20]);
+        
+        var ufo_count = _.values(clustered)
+                .reduce(function (sum, group) {
+                    return sum+group.length;
+                }, 0);
+        
+        return centroids.map(function (pos, i) {
+            return {x: pos[0],
+                    y: pos[1],
+                    max_R: R(ratios[i]),
+                    all_here: clustered[i].length,
+                    abs_all: ufo_count,
+                    population: cluster_populations[i],
+                    count: 0,
+                    R_scale: R,
+                    R: 0};
+        });
     }
 };
 
