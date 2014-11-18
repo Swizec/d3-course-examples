@@ -182,21 +182,28 @@ var prepare = {
 
         function make_keyframe (result, key, i) {           
             var ufos = ufos_by_season[key],
-                cluster_ids = ufos.map(function (ufo) {
-                    return ufo.cluster;
-                }).filter(function (id) { return typeof id != "undefined"; });
-            
+                cluster_ids = _.groupBy(
+                    ufos.map(function (ufo) {
+                        return ufo.cluster;
+                    })
+                        .filter(function (id) { return typeof id != "undefined"; })
+                );
+
             var sum = _.cloneDeep(result.sum);
 
             var currently_drawn = d3.sum(
                 _.values(sum).map(function (d) { return d.count; })
             )+cluster_ids.length;
 
-            cluster_ids.forEach(function (id) {
+            _.keys(cluster_ids).forEach(function (id) {
                 var d = sum[id];
 
-                d.count += 1;
-                d.R = d.R_scale((d.count/d.population)/currently_drawn);
+                d.count += cluster_ids[id].length;
+                if (d.population) {
+                    d.R = d.R_scale((d.count/d.population)/currently_drawn);
+                }else{
+                    d.R = 0;
+                }
 
                 sum[id] = d;
             });

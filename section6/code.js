@@ -101,7 +101,7 @@
                 var season = seasons(step%12);
 
                 d3.select("h1.season")
-                    .html([step+",", season, year].join(" "));
+                    .html([season, year].join(" "));
             }
 
             function timeline_step (step, year, direction) {
@@ -109,13 +109,6 @@
 
                 requestAnimationFrame(function () {
                     drawers.draw_keyframe(keyframes[step]);
-                    //var ufos_in_step = ufos_by_season[[year, season].join("-")];
-
-                    // if (direction > 0) {
-                    //     drawers.place_ufos(ufos_in_step);
-                    // }else{
-                    //     drawers.remove_ufos(ufos_in_step);
-                    // }
                 });
 
                 return year;
