@@ -191,24 +191,32 @@ var prepare = {
 
             var sum = _.cloneDeep(result.sum);
 
-            var currently_drawn = d3.sum(
-                _.values(sum).map(function (d) { return d.count; })
-            )+cluster_ids.length;
+            var currently_drawn = 
+                    d3.sum(_.values(sum).map(function (d) { return d.count; }))
+                    +d3.sum(_.values(cluster_ids).map(function (d) { return d.length; }));
 
-            _.keys(cluster_ids).forEach(function (id) {
-                var d = sum[id];
+            sum = _.mapValues(sum, function (d, id) {                
+                d.count += cluster_ids[id] ? cluster_ids[id].length : 0;
 
-                d.count += cluster_ids[id].length;
                 if (d.population) {
-                    d.R = d.R_scale((d.count/d.population)/currently_drawn);
+                    d.R = (d.count/d.population)/currently_drawn;
                 }else{
                     d.R = 0;
                 }
 
-                sum[id] = d;
+                return d;
+            });
+
+            var R = d3.scale.linear()
+                    .domain([0, d3.max(_.values(sum).map(function (d) { return d.R; }))])
+                    .range([0, 20]);
+
+            sum = _.mapValues(sum, function (d) {
+                d.R = R(d.R);
+                return d;
             });
             
-            result.keyframes.push(sum);
+            result.keyframes.push(_.values(sum));
             result.sum = sum;
             
             return result;

@@ -254,13 +254,13 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
         draw_keyframe: function (keyframe) {
             keyframe.forEach(function (d) {
                 svg.select("#centroid-"+d.id)
-                    //.transition()
-                    //.duration(500)
-                    .attr("r", d.R);// function () { 
+                    .transition()
+                    .duration(500)
+                    .attr("r", d.R)// function () { 
                     //     console.log(d.R, d);
                     //     return d.R; 
                     // });
-                    //.ease(d3.ease('elastic-in'));
+                    .ease(d3.ease('elastic-out'));
             });
         }
     };
