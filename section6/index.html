@@ -3,11 +3,24 @@
 <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
 <link rel="stylesheet" href="style.css">
 
-<div id="graph"></div>
+<div class="container">
 
-<button class="btn btn-primary btn-small pull-left" id="down">-</button>
-<h1 class="season pull-left"></h1>
-<button class="btn btn-primary btn-small pull-left" id="up">+</button>
+  <div class="row">
+    <div id="graph"></div>
+  </div>
+
+  <div class="row controls">
+    <div class="col-md-1 col-md-offset-2">
+      <button class="btn btn-primary btn-lg glyphicon glyphicon-chevron-left" id="down"></button>
+    </div>
+    <div class="col-md-3">
+      <h1 class="season"></h1>
+    </div>
+    <div class="col-md-1">
+      <button class="btn btn-primary btn-lg glyphicon glyphicon-chevron-right" id="up"></button>
+    </div>
+  </div>
+</div>
 
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script src="http://d3js.org/queue.v1.min.js"></script>
