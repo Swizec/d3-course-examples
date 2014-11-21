@@ -52,7 +52,7 @@
                 {centroids: clusters.centroids,
                  clustered: clustered,
                  populations: cluster_populations}
-            ).keyframes;
+            );
 
             console.log(keyframes);
 

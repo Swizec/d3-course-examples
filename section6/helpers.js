@@ -179,7 +179,14 @@ var prepare = {
             })
             .reduce(make_keyframe,
                     {keyframes: [],
-                     sum: base_state});
+                     sum: base_state})
+            .keyframes.map(function (keyframe, i, keyframes) {
+                if (keyframes[i+1]) {
+                    keyframe.ufos['-'] = keyframes[i+1].ufos['+'];
+                }
+
+                return keyframe;
+            });
 
         function make_keyframe (result, key, i) {           
             var ufos = ufos_by_season[key],
@@ -221,11 +228,16 @@ var prepare = {
                     .map(function (ufo) {
                         return geo_projection([Number(ufo.lon), Number(ufo.lat)]);
                     })
-                    .filter(function (pos) { return !!pos; });
+                    .filter(function (pos) { return !!pos; })
+                    .map(function (pos, i) {
+                        return{x: pos[0], 
+                               y: pos[1],
+                               id: [key, i].join('-')};
+                    });
 
             //sum.ufos = sum.ufos.concat(positions);
             sum.ufos = {'+': positions,
-                        '-': sum.ufos['+'] || []};
+                        '-': []};
             
             result.keyframes.push(sum);
             result.sum = sum;
