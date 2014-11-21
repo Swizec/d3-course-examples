@@ -54,8 +54,6 @@
                  populations: cluster_populations}
             );
 
-            console.log(keyframes);
-
             var make_step = (function () {
                 var step = 0,
                     year = 1945,
