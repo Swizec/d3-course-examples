@@ -252,7 +252,7 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
         },
 
         draw_keyframe: function (keyframe) {
-            keyframe.forEach(function (d) {
+            keyframe.centroids.forEach(function (d) {
                 svg.select("#centroid-"+d.id)
                     .transition()
                     .duration(500)
@@ -262,6 +262,22 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                     // });
                     .ease(d3.ease('elastic-out'));
             });
+
+            svg.selectAll("g.points").remove();
+
+            var g = svg.append("g")
+                    .attr("class", "points")
+                    .datum({type: "points"}),
+                drawn = g.selectAll("circle")
+                    .data(keyframe.ufos)
+                    .enter()
+                    .append("circle")
+                    .attr({
+                        cx: function (d) { return d[0]; },
+                        cy: function (d) { return d[1]; },
+                        r: 2,
+                        class: "point"
+                    });
         }
     };
 };

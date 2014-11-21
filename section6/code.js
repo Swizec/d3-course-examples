@@ -48,19 +48,25 @@
 
             var keyframes = prepare.precalc_animation(
                 ufos_by_season,
+                geo_projection,
                 {centroids: clusters.centroids,
                  clustered: clustered,
                  populations: cluster_populations}
             ).keyframes;
 
+            console.log(keyframes);
+
             var make_step = (function () {
                 var step = 0,
-                    year = 1945;
+                    year = 1945,
+                    end_year = 2014;
+
                 return function (direction) {
                     direction || (direction = 1);
-                    if (step+direction < 0) return;
+                    if (step+direction <= 0) return;
+                    if (step >= keyframes.length) return;
 
-                    year = timeline_step(step, year, direction);
+                    timeline_step(step);
 
                     if (direction > 0) {
                         update_caption(step, year);
@@ -104,14 +110,10 @@
                     .html([season, year].join(" "));
             }
 
-            function timeline_step (step, year, direction) {
-                var season = seasons(step%12);
-
-                requestAnimationFrame(function () {
+            function timeline_step (step) {
+                //requestAnimationFrame(function () {
                     drawers.draw_keyframe(keyframes[step]);
-                });
-
-                return year;
+                //});
             };
 
             function timeline_explore() {
