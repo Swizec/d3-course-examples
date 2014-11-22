@@ -97,9 +97,9 @@
                 .call(drag);
 
             d3.select("#down")
-                .on("click", function () { make_step(-1); });
+                .on("mousedown", function () { make_step(-1); });
             d3.select("#up")
-                .on("click", function () { make_step(+1); });
+                .on("mousedown", function () { make_step(+1); });
 
             function update_caption(step, year) {
                 var season = seasons(step%12);
