@@ -256,9 +256,9 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                 keyframe.centroids.forEach(function (d) {
                     svg.select("#centroid-"+d.id)
                         .transition()
-                        .duration(500)
+                        .duration(200)
                         .attr("r", d.R)
-                        .ease(d3.ease('elastic-out'));
+                        .ease(d3.ease('elastic-in'));
                 });
 
                 var remove_ids = keyframe.ufos['-'].map(function (d) {
@@ -280,7 +280,10 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                         r: 2,
                         class: "point",
                         id: function (d) { return 'ufo-'+d.id; }
-                    });
+                    })
+                    .transition()
+                    .duration(250)
+                    .style("opacity", .3);
 
                 svg.selectAll("g.centroids, .point")
                     .sort(function (a, b) {
