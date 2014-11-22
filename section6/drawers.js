@@ -285,12 +285,20 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                     .duration(250)
                     .style("opacity", .3);
 
-                svg.selectAll("g.centroids, .point")
-                    .sort(function (a, b) {
-                        if (a.type == "centroids") return 1;
-                        return -1;
-                    });
+                // svg.selectAll("g.centroids, .point")
+                //     .sort(function (a, b) {
+                //         if (a.type == "centroids") return 1;
+                //         return -1;
+                //     });
             };
-        })()
+        })(),
+        
+        cleanup: function () {
+            svg.selectAll("g.centroids, .point")
+                .sort(function (a, b) {
+                    if (a.type == "centroids") return 1;
+                    return -1;
+                });
+        }
     };
 };

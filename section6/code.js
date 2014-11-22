@@ -64,7 +64,7 @@
                     if (step+direction <= 0) return;
                     if (step >= keyframes.length) return;
 
-                    timeline_step(step);
+                    drawers.draw_keyframe(keyframes[step]);
 
                     if (direction > 0) {
                         update_caption(step, year);
@@ -84,22 +84,31 @@
                         update_caption(step, year);
                     }
                 };
-            })();
-            //stepper = setInterval(make_step, 1000);
+            })(),
+            stepper = setInterval(make_step, 500);
 
             make_step();
 
             var drag = d3.behavior.drag()
                     .origin(function () { return {x: 0, y: 0}; })
-                    .on("drag", timeline_explore);
+                    .on("drag", function () {                        
+                        if (d3.event.x < 0) {
+                            // back in time
+                            timeline_explore(-1);
+                        }else{
+                            // forward in time
+                            timeline_explore(+1);
+                        }
+                    })
+                    .on("dragend", drawers.cleanup);
 
             d3.select("h1.season")
                 .call(drag);
 
             d3.select("#down")
-                .on("mousedown", function () { make_step(-1); });
+                .on("mousedown", function () { timeline_explore(-1); });
             d3.select("#up")
-                .on("mousedown", function () { make_step(+1); });
+                .on("mousedown", function () { timeline_explore(+1); });
 
             function update_caption(step, year) {
                 var season = seasons(step%12);
@@ -108,23 +117,13 @@
                     .html([season, year].join(" "));
             }
 
-            function timeline_step (step) {
-                //requestAnimationFrame(function () {
-                    drawers.draw_keyframe(keyframes[step]);
-                //});
-            };
-
-            function timeline_explore() {
+            function timeline_explore(direction) {
                 if (typeof stepper !== "undefined") {
                     clearInterval(stepper);
                 }
 
-                if (d3.event.x < 0) {
-                    // back in time
-                    make_step(-1);
-                }else{
-                    // forward in time
-                    make_step(+1);
+                if (direction) {
+                    make_step(direction);
                 }
             }
         });
