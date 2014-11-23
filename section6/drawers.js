@@ -46,7 +46,11 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                 });
         },
 
-        centroids: function (centroids) {
+        centroids: function (centroids) {            
+            svg.append("g")
+                .attr("class", "points")
+                .datum({type: "points"});
+
             centroids = centroids.map(function (pos, i) {
                 return {x: pos[0],
                         y: pos[1]};
@@ -67,13 +71,9 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                     class: "centroid",
                     id: function (d, i) { return "centroid-"+i; }
                 });
-
         },
 
-        draw_keyframe: (function () {
-            var all_ufos = [];
-
-            return function (keyframe) {
+        draw_keyframe: function (keyframe) {
                 keyframe.centroids.forEach(function (d) {
                     svg.select("#centroid-"+d.id)
                         .transition()
@@ -90,7 +90,8 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                     svg.selectAll(remove_ids.join(',')).remove();
                 }
 
-                svg.selectAll('circle.point')
+                svg.select('g.points')
+                    .selectAll('circle')
                     .data(keyframe.ufos['+'],
                          function (d) { return d.id; })
                     .enter()
@@ -105,15 +106,6 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                     .transition()
                     .duration(250)
                     .style("opacity", .3);
-            };
-        })(),
-        
-        cleanup: function () {
-            svg.selectAll("g.centroids, .point")
-                .sort(function (a, b) {
-                    if (a.type == "centroids") return 1;
-                    return -1;
-                });
         }
     };
 };

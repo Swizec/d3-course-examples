@@ -99,8 +99,7 @@
                             // forward in time
                             timeline_explore(+1);
                         }
-                    })
-                    .on("dragend", drawers.cleanup);
+                    });
 
             d3.select("h1.season")
                 .call(drag);
