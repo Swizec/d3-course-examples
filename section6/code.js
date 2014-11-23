@@ -85,10 +85,8 @@
                     }
                 };
             })(),
-            stepper = setInterval(make_step, 500);
-
-            make_step();
-
+            animation = Animation();
+            
             var drag = d3.behavior.drag()
                     .origin(function () { return {x: 0, y: 0}; })
                     .on("drag", function () {                        
@@ -105,9 +103,17 @@
                 .call(drag);
 
             d3.select("#down")
-                .on("mousedown", function () { timeline_explore(-1); });
+                .on("click", function () { timeline_explore(-1); });
             d3.select("#up")
-                .on("mousedown", function () { timeline_explore(+1); });
+                .on("click", function () { timeline_explore(+1); });
+            d3.select("#pause")
+                .on("click", animation.pause);
+            d3.select("#play")
+                .on("click", animation.play);
+            d3.select("#speedUp")
+                .on("click", animation.speedUp);
+            d3.select("#slowDown")
+                .on("click", animation.slowDown);
 
             function update_caption(step, year) {
                 var season = seasons(step%12);
@@ -117,14 +123,62 @@
             }
 
             function timeline_explore(direction) {
-                if (typeof stepper !== "undefined") {
-                    clearInterval(stepper);
-                }
+                pause_animation();
 
                 if (direction) {
                     make_step(direction);
                 }
             }
+
+            function Animation() {
+                var player,
+                    playing = false,
+                    speed = 1;
+   
+                function toggle_controls() {
+                    d3.select("#play")
+                        .classed("hidden", playing);
+                    d3.select("#pause")
+                        .classed("hidden", !playing);
+                }
+
+                function stop () {
+                    clearInterval(player);
+                }
+
+                function start () {
+                    player = setInterval(make_step, speed*500);
+                }
+                
+                return {
+                    pause: function () {
+                        playing = false;                
+                        toggle_controls();
+                        
+                        stop();
+                    },
+
+                    play: function () {
+                        playing = true;
+                        toggle_controls();
+                        
+                        start();
+                    },
+
+                    speedUp: function () {
+                        stop();
+                        speed /= 1.5;
+                        start();
+                    },
+
+                    slowDown: function () {
+                        stop();
+                        speed *= 1.5;
+                        start();
+                    }
+                };
+            };
         });
 
+    $('[data-toggle="tooltip"]').tooltip();
 })();

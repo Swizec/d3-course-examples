@@ -10,17 +10,25 @@
   </div>
 
   <div class="row controls">
-    <div class="col-md-1 col-md-offset-2">
-      <button class="btn btn-primary btn-lg glyphicon glyphicon-chevron-left" id="down"></button>
+    <div class="col-md-2 col-md-offset-1">
+      <button class="btn btn-primary btn-lg glyphicon glyphicon-chevron-left" id="down" data-toggle="tooltip" data-placement="bottom" title="Step back"></button>
+      <button class="btn btn-primary btn-lg glyphicon glyphicon-backward" id="slowDown" data-toggle="tooltip" data-placement="bottom" title="Slow down animation"></button>
     </div>
     <div class="col-md-3">
-      <h1 class="season"></h1>
+      <h1 class="season" data-toggle="tooltip" data-placement="bottom" title="Drag to explore"></h1>
     </div>
-    <div class="col-md-1">
-      <button class="btn btn-primary btn-lg glyphicon glyphicon-chevron-right" id="up"></button>
+
+    <div class="col-md-3">
+      <button class="btn btn-primary btn-lg glyphicon glyphicon-pause" id="pause" data-toggle="tooltip" data-placement="bottom" title="Pause animation"></button>
+      <button class="btn btn-primary btn-lg glyphicon glyphicon-play" id="play" data-toggle="tooltip" data-placement="bottom" title="Play animation"></button>
+      <button class="btn btn-primary btn-lg glyphicon glyphicon-forward" id="speedUp" data-toggle="tooltip" data-placement="bottom" title="Speed up animation"></button>
+      <button class="btn btn-primary btn-lg glyphicon glyphicon-chevron-right" id="up" data-toggle="tooltip" data-placement="bottom" title="Step forward"></button>
     </div>
   </div>
 </div>
+
+<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
 
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script src="http://d3js.org/queue.v1.min.js"></script>
