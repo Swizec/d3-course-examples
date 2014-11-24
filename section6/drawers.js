@@ -53,7 +53,8 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
 
             centroids = centroids.map(function (pos, i) {
                 return {x: pos[0],
-                        y: pos[1]};
+                        y: pos[1],
+                        id: i};
             });
             
             svg.append("g")
@@ -69,43 +70,46 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                     //r: function (d, i) { return R(ratios[i]); },
                     r: 0,
                     class: "centroid",
-                    id: function (d, i) { return "centroid-"+i; }
+                    id: function (d) { return "centroid-"+d.id; }
+                })
+                .on("mouseover", function (d) {
+                    console.log(svg.selectAll(".centroid-"+d.id));
                 });
         },
 
         draw_keyframe: function (keyframe) {
-                keyframe.centroids.forEach(function (d) {
-                    svg.select("#centroid-"+d.id)
-                        .transition()
-                        .duration(200)
-                        .attr("r", d.R)
-                        .ease(d3.ease('elastic-in'));
-                });
-
-                var remove_ids = keyframe.ufos['-'].map(function (d) {
-                    return '#ufo-'+d.id;
-                });
-
-                if (remove_ids.length > 0) {
-                    svg.selectAll(remove_ids.join(',')).remove();
-                }
-
-                svg.select('g.points')
-                    .selectAll('circle')
-                    .data(keyframe.ufos['+'],
-                         function (d) { return d.id; })
-                    .enter()
-                    .append('circle')
-                    .attr({
-                        cx: function (d) { return d.x; },
-                        cy: function (d) { return d.y; },
-                        r: 2,
-                        class: "point",
-                        id: function (d) { return 'ufo-'+d.id; }
-                    })
+            keyframe.centroids.forEach(function (d) {
+                svg.select("#centroid-"+d.id)
                     .transition()
-                    .duration(250)
-                    .style("opacity", .3);
+                    .duration(200)
+                    .attr("r", d.R)
+                    .ease(d3.ease('elastic-in'));
+            });
+            
+            var remove_ids = keyframe.ufos['-'].map(function (d) {
+                return '#ufo-'+d.id;
+            });
+            
+            if (remove_ids.length > 0) {
+                svg.selectAll(remove_ids.join(',')).remove();
+            }
+            
+            svg.select('g.points')
+                .selectAll('circle')
+                .data(keyframe.ufos['+'],
+                      function (d) { return d.id; })
+                .enter()
+                .append('circle')
+                .attr({
+                    cx: function (d) { return d.x; },
+                    cy: function (d) { return d.y; },
+                    r: 2,
+                    class: function (d) { return "point centroid-"+d.cluster; },
+                    id: function (d) { return 'ufo-'+d.id; }
+                })
+                .transition()
+                .duration(250)
+                .style("opacity", .3);
         }
     };
 };

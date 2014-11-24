@@ -232,7 +232,8 @@ var prepare = {
                     .map(function (pos, i) {
                         return{x: pos[0], 
                                y: pos[1],
-                               id: [key, i].join('-')};
+                               id: [key, i].join('-'),
+                               cluster: ufos[i].cluster};
                     });
 
             //sum.ufos = sum.ufos.concat(positions);
