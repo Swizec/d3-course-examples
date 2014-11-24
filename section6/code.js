@@ -86,6 +86,8 @@
                 };
             })(),
             animation = Animation();
+
+            animation.play_forward();
             
             var drag = d3.behavior.drag()
                     .origin(function () { return {x: 0, y: 0}; })
@@ -106,13 +108,13 @@
                 .on("click", function () { timeline_explore(-1); });
             d3.select("#up")
                 .on("click", function () { timeline_explore(+1); });
-            d3.select(".pause")
+            d3.selectAll(".pause")
                 .on("click", animation.pause);
             d3.select("#play_forward")
                 .on("click", animation.play_forward);
             d3.select("#play_backward")
                 .on("click", animation.play_backward);
-            d3.select("#speedUp")
+            d3.selectAll(".speedUp")
                 .on("click", animation.speedUp);
 
             function update_caption(step, year) {
@@ -123,7 +125,7 @@
             }
 
             function timeline_explore(direction) {
-                pause_animation();
+                animation.stop();
 
                 if (direction) {
                     make_step(direction);
@@ -136,38 +138,59 @@
                     speed = 1,
                     direction = 1;
    
-                function toggle_controls() {
+                function toggle_controls() {                    
                     d3.select("#play_forward")
-                        .classed("hidden", playing);
-                    d3.select(".pause")
-                        .classed("hidden", !playing);
-                    d3.select("#speedUp")
-                        .classed("hidden", !playing);
+                        .classed("hidden", playing && direction > 0);
+                    d3.select("#play_backward")
+                        .classed("hidden", playing && direction < 0);
+
+                    d3.select(".left .pause")
+                        .classed("hidden", !playing || direction > 0);
+                    d3.select(".right .pause")
+                        .classed("hidden", !playing || direction < 0);
+
+                    d3.select(".left .speedUp")
+                        .classed("hidden", !playing || direction > 0);
+                    d3.select(".right .speedUp")
+                        .classed("hidden", !playing || direction < 0);
                 }
 
                 function stop () {
+                    playing = false;
                     clearInterval(player);
                 }
 
                 function start () {
-                    console.log(speed);
-                    player = setInterval(make_step, speed*500);
+                    playing = true;
+                    player = setInterval(function () {
+                        make_step(direction);
+                    }, speed*500);
                 }
                 
                 return {
                     pause: function () {
-                        playing = false;                
                         toggle_controls();
                         
                         stop();
                     },
 
-                    play_forward: function () {        
-                        playing = true;
+                    play_forward: function () {
+                        stop();
+
                         speed = 1;
                         direction = 1;
 
                         start();                        
+                        toggle_controls();
+                    },
+
+                    play_backward: function () {
+                        stop();
+
+                        speed = 1;
+                        direction = -1;
+
+                        start();
                         toggle_controls();
                     },
 
