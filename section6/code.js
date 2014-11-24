@@ -106,14 +106,14 @@
                 .on("click", function () { timeline_explore(-1); });
             d3.select("#up")
                 .on("click", function () { timeline_explore(+1); });
-            d3.select("#pause")
+            d3.select(".pause")
                 .on("click", animation.pause);
-            d3.select("#play")
-                .on("click", animation.play);
+            d3.select("#play_forward")
+                .on("click", animation.play_forward);
+            d3.select("#play_backward")
+                .on("click", animation.play_backward);
             d3.select("#speedUp")
                 .on("click", animation.speedUp);
-            d3.select("#slowDown")
-                .on("click", animation.slowDown);
 
             function update_caption(step, year) {
                 var season = seasons(step%12);
@@ -133,12 +133,15 @@
             function Animation() {
                 var player,
                     playing = false,
-                    speed = 1;
+                    speed = 1,
+                    direction = 1;
    
                 function toggle_controls() {
-                    d3.select("#play")
+                    d3.select("#play_forward")
                         .classed("hidden", playing);
-                    d3.select("#pause")
+                    d3.select(".pause")
+                        .classed("hidden", !playing);
+                    d3.select("#speedUp")
                         .classed("hidden", !playing);
                 }
 
@@ -147,6 +150,7 @@
                 }
 
                 function start () {
+                    console.log(speed);
                     player = setInterval(make_step, speed*500);
                 }
                 
@@ -158,20 +162,26 @@
                         stop();
                     },
 
-                    play: function () {
+                    play_forward: function () {        
                         playing = true;
+                        speed = 1;
+                        direction = 1;
+
+                        start();                        
                         toggle_controls();
-                        
-                        start();
                     },
 
                     speedUp: function () {
+                        if (!playing) return;
+
                         stop();
                         speed /= 1.5;
                         start();
                     },
 
                     slowDown: function () {
+                        if (!playing) return;
+
                         stop();
                         speed *= 1.5;
                         start();
