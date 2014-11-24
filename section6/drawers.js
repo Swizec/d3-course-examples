@@ -73,7 +73,14 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                     id: function (d) { return "centroid-"+d.id; }
                 })
                 .on("mouseover", function (d) {
-                    console.log(svg.selectAll(".centroid-"+d.id));
+                    svg.selectAll(".point")
+                        .style("opacity", .1);
+                    svg.selectAll(".point.centroid-"+d.id)
+                        .style("opacity", 1);
+                })
+                .on("mouseout", function (d) {
+                    svg.selectAll(".centroid-"+d.id)
+                        .style("opacity", .3);
                 });
         },
 
