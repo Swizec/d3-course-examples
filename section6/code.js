@@ -22,7 +22,7 @@
         .defer(d3.xml, "data/military-bases.kml")
         .defer(d3.csv, "data/full-data-geodata.csv")
         .await(function (err, US, states_hash, populations, city_populations, military_bases, _ufos) {
-            _ufos = prepare.filter_ufos(_ufos);
+            _ufos = prepare.filter_ufos(_ufos, geo_projection);
             var ufos = prepare.ufos(_ufos);
             populations = prepare.populations(populations);
             var states = prepare.states(states_hash);

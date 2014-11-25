@@ -74,12 +74,13 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                 })
                 .on("mouseover", function (d) {
                     svg.selectAll(".point")
-                        .style("opacity", .1);
+                        .style("opacity", 0);
                     svg.selectAll(".point.centroid-"+d.id)
                         .style("opacity", 1);
+                    console.log(svg.selectAll(".point.centroid-"+d.id));
                 })
                 .on("mouseout", function (d) {
-                    svg.selectAll(".centroid-"+d.id)
+                    svg.selectAll(".point")
                         .style("opacity", .3);
                 });
         },
