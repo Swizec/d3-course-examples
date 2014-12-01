@@ -125,7 +125,7 @@
             }
 
             function timeline_explore(direction) {
-                animation.stop();
+                animation.pause();
 
                 if (direction) {
                     make_step(direction);
