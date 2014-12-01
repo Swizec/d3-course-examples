@@ -46,10 +46,13 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                 });
         },
 
-        centroids: function (centroids) {            
+        centroids: function (centroids) {
             svg.append("g")
                 .attr("class", "points")
                 .datum({type: "points"});
+
+            svg.append("g")
+                .attr("class", "hull_layer");
 
             centroids = centroids.map(function (pos, i) {
                 return {x: pos[0],
@@ -73,21 +76,31 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                     id: function (d) { return "centroid-"+d.id; }
                 })
                 .on("mouseover", function (d) {
-                    var vertices = svg
-                            .selectAll(".point.centroid-"+d.id)
+                    var centroid = d,
+                        vertices = svg
+                            .selectAll(".point.centroid-"+centroid.id)
                             .data()
                             .map(function (d) { 
                                 return [d.x, d.y];
                             }),
                         hull = d3.geom.hull(vertices);
-                            //.x(function (d) { return d.x; })
-                            //.y(function (d) { return d.y; });
-                            //.hull(vertices);
+                    
+                    if (!hull.length) return;
 
-                    svg.append("path")
+                    svg.select("g.hull_layer")
+                        .append("path")
                         .attr("class", "hull")
                         .datum(hull)
-                        .attr("d", function (d) { return "M" + d.join("L") + "Z"; });
+                        .attr("d", function (d) {
+                            return "M"+d.map(function () { 
+                                return [centroid.x, centroid.y];
+                            }).join("L") + "Z";
+                        })
+                        .transition()
+                        .duration(300)
+                        .attr("d", function (d) {
+                            return "M" + d.join("L") + "Z";
+                        });
                 })
                 .on("mouseout", function (d) {
                     svg.select(".hull")
