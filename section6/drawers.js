@@ -73,15 +73,25 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                     id: function (d) { return "centroid-"+d.id; }
                 })
                 .on("mouseover", function (d) {
-                    svg.selectAll(".point")
-                        .style("opacity", 0);
-                    svg.selectAll(".point.centroid-"+d.id)
-                        .style("opacity", 1);
-                    console.log(svg.selectAll(".point.centroid-"+d.id));
+                    var vertices = svg
+                            .selectAll(".point.centroid-"+d.id)
+                            .data()
+                            .map(function (d) { 
+                                return [d.x, d.y];
+                            }),
+                        hull = d3.geom.hull(vertices);
+                            //.x(function (d) { return d.x; })
+                            //.y(function (d) { return d.y; });
+                            //.hull(vertices);
+
+                    svg.append("path")
+                        .attr("class", "hull")
+                        .datum(hull)
+                        .attr("d", function (d) { return "M" + d.join("L") + "Z"; });
                 })
                 .on("mouseout", function (d) {
-                    svg.selectAll(".point")
-                        .style("opacity", .3);
+                    svg.select(".hull")
+                        .remove();
                 });
         },
 
