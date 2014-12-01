@@ -54,6 +54,8 @@
                  populations: cluster_populations}
             );
 
+            var animation = Animation();
+
             var make_step = (function () {
                 var step = 0,
                     year = 1945,
@@ -61,8 +63,12 @@
 
                 return function (direction) {
                     direction || (direction = 1);
-                    if (step+direction <= 0) return;
-                    if (step >= keyframes.length) return;
+                    if (step+direction <= 0
+                        || step >= keyframes.length) {
+                        
+                        animation.pause();
+                        return;
+                    };
 
                     drawers.draw_keyframe(keyframes[step]);
 
@@ -84,8 +90,7 @@
                         update_caption(step, year);
                     }
                 };
-            })(),
-            animation = Animation();
+            })();
 
             animation.play_forward();
             
@@ -169,9 +174,8 @@
                 
                 return {
                     pause: function () {
-                        toggle_controls();
-                        
                         stop();
+                        toggle_controls();
                     },
 
                     play_forward: function () {
