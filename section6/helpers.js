@@ -180,7 +180,7 @@ var prepare = {
                 key = key.split("-");
                 return Number(key[0]) >= start_year;
             })
-            .reduce(make_keyframe,
+            .reduce(_.curry(make_keyframe)(ufos_by_season, geo_projection),
                     {keyframes: [],
                      sum: base_state})
             .keyframes.map(function (keyframe, i, keyframes) {
@@ -190,63 +190,6 @@ var prepare = {
 
                 return keyframe;
             });
-
-        function make_keyframe (result, key, i) {           
-            var ufos = ufos_by_season[key],
-                cluster_ids = _.groupBy(
-                    ufos.map(function (ufo) {
-                        return ufo.cluster;
-                    })
-                        .filter(function (id) { return typeof id != "undefined"; })
-                );
-
-            var sum = _.cloneDeep(result.sum);
-
-            var currently_drawn = 
-                    d3.sum(sum.centroids.map(function (d) { return d.count; }))
-                    +d3.sum(_.values(cluster_ids).map(function (d) { return d.length; }));
-
-            sum.centroids = sum.centroids.map(function (d) {
-                d.count += cluster_ids[d.id] ? cluster_ids[d.id].length : 0;
-
-                if (d.population) {
-                    d.R = (d.count/d.population)/currently_drawn;
-                }else{
-                    d.R = 0;
-                }
-
-                return d;
-            });
-
-            var R = d3.scale.linear()
-                    .domain([0, d3.max(sum.centroids.map(function (d) { return d.R; }))])
-                    .range([0, 20]);
-
-            sum.centroids = sum.centroids.map(function (d) {
-                d.R = R(d.R);
-                return d;
-            });
-
-            var positions = ufos
-                    .map(function (ufo) {
-                        return geo_projection([Number(ufo.lon), Number(ufo.lat)]);
-                    })
-                    .map(function (pos, i) {
-                        return{x: pos[0], 
-                               y: pos[1],
-                               id: [key, i].join('-'),
-                               cluster: ufos[i].cluster};
-                    });
-
-            //sum.ufos = sum.ufos.concat(positions);
-            sum.ufos = {'+': positions,
-                        '-': []};
-            
-            result.keyframes.push(sum);
-            result.sum = sum;
-            
-            return result;
-        }
     },
 
     centroid_base_state: function (centroids, clustered, cluster_populations) {
@@ -322,3 +265,61 @@ var year_season_ordering = function (seasons, a, b) {
     
     return order;
 };
+
+var make_keyframe = function make_keyframe (ufos_by_season, geo_projection, 
+                                            result, key, i) {           
+    var ufos = ufos_by_season[key],
+        cluster_ids = _.groupBy(
+            ufos.map(function (ufo) {
+                return ufo.cluster;
+            })
+                .filter(function (id) { return typeof id != "undefined"; })
+        );
+
+    var sum = _.cloneDeep(result.sum);
+
+    var currently_drawn = 
+            d3.sum(sum.centroids.map(function (d) { return d.count; }))
+            +d3.sum(_.values(cluster_ids).map(function (d) { return d.length; }));
+
+    sum.centroids = sum.centroids.map(function (d) {
+        d.count += cluster_ids[d.id] ? cluster_ids[d.id].length : 0;
+
+        if (d.population) {
+            d.R = (d.count/d.population)/currently_drawn;
+        }else{
+            d.R = 0;
+        }
+
+        return d;
+    });
+
+    var R = d3.scale.linear()
+            .domain([0, d3.max(sum.centroids.map(function (d) { return d.R; }))])
+            .range([0, 20]);
+
+    sum.centroids = sum.centroids.map(function (d) {
+        d.R = R(d.R);
+        return d;
+    });
+
+    var positions = ufos
+            .map(function (ufo) {
+                return geo_projection([Number(ufo.lon), Number(ufo.lat)]);
+            })
+            .map(function (pos, i) {
+                return{x: pos[0], 
+                       y: pos[1],
+                       id: [key, i].join('-'),
+                       cluster: ufos[i].cluster};
+            });
+
+    //sum.ufos = sum.ufos.concat(positions);
+    sum.ufos = {'+': positions,
+                '-': []};
+    
+    result.keyframes.push(sum);
+    result.sum = sum;
+    
+    return result;
+}
