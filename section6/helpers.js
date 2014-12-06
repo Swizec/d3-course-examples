@@ -304,7 +304,7 @@ var make_keyframe = function make_keyframe (ufos_by_season, geo_projection,
     });
 
     var positions = ufos
-            .map(function (ufo) {
+                        .map(function (ufo) {
                 return geo_projection([Number(ufo.lon), Number(ufo.lat)]);
             })
             .map(function (pos, i) {
