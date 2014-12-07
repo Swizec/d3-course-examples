@@ -58,8 +58,7 @@
 
             var make_step = (function () {
                 var step = 0,
-                    year = 1945,
-                    end_year = 2014;
+                    year = 1945;
 
                 return function (direction) {
                     direction || (direction = 1);
