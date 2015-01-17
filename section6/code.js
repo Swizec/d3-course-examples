@@ -38,7 +38,6 @@
 
             drawers.map(US, geo_path, states);
             drawers.bases(military_bases, geo_projection);
-            
             drawers.centroids(clusters.centroids, clustered, cluster_populations);
 
             var ufos_by_season = prepare.ufos_by_season(_ufos, clusters.assignments),

@@ -142,24 +142,19 @@ var prepare = {
     },
 
     base_positions: function (military_bases, projection) {
-        return _.map(
+        return _.filter(_.map(
             military_bases.getElementsByTagName("Placemark"), function (d) {
-                var point = _.find(d.children, 
-                                   function (node) { 
-                                       return node.nodeName == "Point"; 
-                                   }).textContent.split(",");
+                var point = d.getElementsByTagName("Point")[0]
+                        .textContent.split(",");
+                var icon = d.getElementsByTagName("Style")[0];
 
-                var icon = _.find(d.children,
-                                  function (node) {
-                                      return node.nodeName == "Style";
-                                  });
-                if (icon.innerHTML.indexOf("force-icons.png") < 1
-                    && icon.innerHTML.indexOf("navy-icons.png") < 1) {
+                if (icon.textContent.indexOf("force-icons.png") < 1
+                    && icon.textContent.indexOf("navy-icons.png") < 1) {
                     return null;
                 }                    
                 return projection([Number(point[0]), Number(point[1])]);
             })
-            .filter(function (d) { return !!d; });
+            , function (d) { return !!d; });
     },
 
     precalc_animation: function (ufos_by_season, geo_projection, centroids) {
