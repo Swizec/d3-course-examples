@@ -1,8 +1,61 @@
 
+var Resizer = function (svg, width, height, geo_projection) {
+
+    var size_ratio = width/height,
+        max_width = width,
+        max_height = height;
+
+    return function resize_viz() {
+            var _w = window.innerWidth,
+                _h = window.innerHeight;
+            
+            if (_w < width) {
+                width = _w;
+                height = width/size_ratio;
+            }else if (_h < height) {
+                height = _h;
+                width = height*size_ratio;
+            }
+
+            if (_w > width) {
+                width = _w;
+                height = width/size_ratio;
+
+                if (_h < height) {
+                    height = _h;
+                    width = height*size_ratio;
+                }
+            }else if (_h > height) {
+                height = _h;
+                width = height*size_ratio;
+
+                if (_w < width) {
+                    width = _w;
+                    height = width/size_ratio;
+                }
+            }
+
+            if (width > max_width) {
+                width = max_width;
+                height = width/size_ratio;
+            }
+            if (height > max_height) {
+                height = max_height;
+                width = height*size_ratio;
+            }
+
+            svg.attr("width", width)
+                .attr("height", height);
+
+            geo_projection
+                .scale(width)
+                .translate([width / 2, height / 2]);
+        };
+};
+
 var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
 
     return {
-
         map: function (US, geo_path, states) {
             var ufoCounts = _.mapValues(ufos, function (ufos, state) {
                 return ufos.length/populations.get(states.get(state))[2010];

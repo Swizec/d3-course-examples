@@ -4,8 +4,7 @@
     var max_width = 960,
         max_height = 600,
         width = max_width,
-        height = max_height,
-        ratio = width/height;
+        height = max_height;
 
     var geo_projection = d3.geo.albersUsa()
             .scale(width)
@@ -17,56 +16,6 @@
             .attr("width", width)
             .attr("height", height);
 
-    function resize_viz() {
-        var _w = window.innerWidth,
-            _h = window.innerHeight;
-
-        if (_w < width) {
-            width = _w;
-            height = width/ratio;
-        }else if (_h < height) {
-            height = _h;
-            width = height*ratio;
-        }
-
-        if (_w > width) {
-            width = _w;
-            height = width/ratio;
-
-            if (_h < height) {
-                height = _h;
-                width = height*ratio;
-            }
-        }else if (_h > height) {
-            height = _h;
-            width = height*ratio;
-
-            if (_w < width) {
-                width = _w;
-                height = width/ratio;
-            }
-        }
-
-        if (width > max_width) {
-            width = max_width;
-            height = width/ratio;
-        }
-        if (height > max_height) {
-            height = max_height;
-            width = height*ratio;
-        }
-
-        svg.attr("width", width)
-            .attr("height", height);
-
-        geo_projection
-            .scale(width)
-            .translate([width / 2, height / 2]);
-    }
-
-    window.onresize = resize_viz;
-    resize_viz();
-
     queue()
         .defer(d3.json, "data/us.json")
         .defer(d3.json, "data/states-hash.json")
@@ -75,6 +24,10 @@
         .defer(d3.xml, "data/military-bases.kml")
         .defer(d3.csv, "data/full-data-geodata.csv")
         .await(function (err, US, states_hash, populations, city_populations, military_bases, _ufos) {
+            var resize_viz = Resizer(svg, width, height, geo_projection);
+            window.onresize = resize_viz;
+            resize_viz();
+            
             _ufos = prepare.filter_ufos(_ufos, geo_projection);
             var ufos = prepare.ufos(_ufos);
             populations = prepare.populations(populations);
