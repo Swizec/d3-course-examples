@@ -145,14 +145,19 @@ var prepare = {
         return _.filter(_.map(
             military_bases.getElementsByTagName("Placemark"), function (d) {
                 var point = d.getElementsByTagName("Point")[0]
-                        .textContent.split(",");
+                        .textContent.split(",")
+                        .map(Number);
                 var icon = d.getElementsByTagName("Style")[0];
 
                 if (icon.textContent.indexOf("force-icons.png") < 1
                     && icon.textContent.indexOf("navy-icons.png") < 1) {
                     return null;
-                }                    
-                return projection([Number(point[0]), Number(point[1])]);
+                }
+                var pos = projection([point[0], point[1]]);
+                return pos && {x: pos[0],
+                               y: pos[1],
+                               lat: point[0],
+                               lon: point[1]};
             })
             , function (d) { return !!d; });
     },

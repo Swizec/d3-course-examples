@@ -14,6 +14,14 @@ var Resizer = function (svg, width, height, geo_path, geo_projection) {
             .attr("d", geo_path);
     };
 
+    var move_datapoints = function () {
+        svg.selectAll(".base")
+            .attr("transform", function (d) {
+                var pos = geo_projection([d.lat, d.lon]);
+                return pos && "translate("+pos[0]+","+pos[1]+")";
+            });
+    };
+
     return function resize_viz() {
         var _w = window.innerWidth,
             _h = window.innerHeight;
@@ -61,6 +69,7 @@ var Resizer = function (svg, width, height, geo_path, geo_projection) {
             .translate([width / 2, height / 2]);
 
         resize_map();
+        move_datapoints();
     };
 };
 
@@ -106,7 +115,7 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                 .attr("d", d3.svg.symbol().type("cross").size(32))
                 .attr("class", "base")
                 .attr("transform", function (d) {
-                    return "translate("+d[0]+","+d[1]+")";
+                    return "translate("+d.x+","+d.y+")";
                 });
         },
 
