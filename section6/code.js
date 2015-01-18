@@ -2,7 +2,8 @@
 (function () {
 
     var width = 960,
-        height = 600;
+        height = 600,
+        ratio = width/height;
 
     var geo_projection = d3.geo.albersUsa()
             .scale(1280)
@@ -13,6 +14,42 @@
     var svg = d3.select("#graph").append("svg")
             .attr("width", width)
             .attr("height", height);
+
+    function resize_viz() {
+        var _w = window.innerWidth,
+            _h = window.innerHeight;
+
+        if (_w < width) {
+            width = _w;
+            height = width/ratio;
+        }else if (_h < height) {
+            height = _h;
+            width = height*ratio;
+        }
+
+        if (_w > width) {
+            width = _w;
+            height = width/ratio;
+
+            if (_h < height) {
+                height = _h;
+                width = height*ratio;
+            }
+        }else if (_h > height) {
+            height = _h;
+            width = height*ratio;
+
+            if (_w < width) {
+                width = _w;
+                height = width/ratio;
+            }
+        }
+
+        console.log(width, height);
+    }
+
+    window.onresize = resize_viz;
+    resize_viz();
 
     queue()
         .defer(d3.json, "data/us.json")
@@ -81,7 +118,13 @@
             d3.selectAll(".speedUp")
                 .on("click", animation.speedUp);
 
+            
         });
 
     $('[data-toggle="tooltip"]').tooltip();
 })();
+
+
+// window.onresize = function () {
+//     resize_viz();
+// };
