@@ -24,7 +24,7 @@
         .defer(d3.xml, "data/military-bases.kml")
         .defer(d3.csv, "data/full-data-geodata.csv")
         .await(function (err, US, states_hash, populations, city_populations, military_bases, _ufos) {
-            var resize_viz = Resizer(svg, width, height, geo_projection);
+            var resize_viz = Resizer(svg, width, height, geo_path, geo_projection);
             window.onresize = resize_viz;
             resize_viz();
             
