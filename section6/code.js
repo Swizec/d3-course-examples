@@ -1,12 +1,14 @@
 
 (function () {
 
-    var width = 960,
-        height = 600,
+    var max_width = 960,
+        max_height = 600,
+        width = max_width,
+        height = max_height,
         ratio = width/height;
 
     var geo_projection = d3.geo.albersUsa()
-            .scale(1280)
+            .scale(width)
             .translate([width / 2, height / 2]),
         geo_path = d3.geo.path()
             .projection(geo_projection);
@@ -45,7 +47,21 @@
             }
         }
 
-        console.log(width, height);
+        if (width > max_width) {
+            width = max_width;
+            height = width/ratio;
+        }
+        if (height > max_height) {
+            height = max_height;
+            width = height*ratio;
+        }
+
+        svg.attr("width", width)
+            .attr("height", height);
+
+        geo_projection
+            .scale(width)
+            .translate([width / 2, height / 2]);
     }
 
     window.onresize = resize_viz;
