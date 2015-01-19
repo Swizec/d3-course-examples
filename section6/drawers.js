@@ -32,12 +32,6 @@ var Resizer = function (svg, width, height, geo_path, geo_projection) {
     };
 
     return function resize_viz() {
-        // var left_margin = [$(".container").css("margin-left"),
-        //                    $(".container").css("padding-left"),
-        //                    $(".row").css("padding-left")
-        //                    ].reduce(function (m, el) {
-        //                        return m+Number(el.replace("px", ""));
-        //                    }, 0),
         var _w = d3.min([window.innerWidth, $("#graph").width()]),
             _h = window.innerHeight;
         
@@ -146,8 +140,8 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                 var geo_pos = geo_projection.invert(pos);
                 return {x: pos[0],
                         y: pos[1],
-                        lon: geo_pos[0],
-                        lat: geo_pos[1],
+                        lon: Number(geo_pos[0]),
+                        lat: Number(geo_pos[1]),
                         id: i};
             });
             
@@ -171,9 +165,10 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                         vertices = svg
                             .selectAll(".point.centroid-"+centroid.id)
                             .data()
-                            .map(function (d) { 
-                                return [d.x, d.y];
-                            }),
+                            .map(function (d) {
+                                return geo_projection([Number(d.lon), Number(d.lat)]);
+                            })
+                            .filter(function (pos) { return !!pos; }),
                         hull = d3.geom.hull(vertices);
                     
                     if (!hull.length) return;
@@ -184,7 +179,7 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                         .datum(hull)
                         .attr("d", function (d) {
                             return "M"+d.map(function () { 
-                                return [centroid.x, centroid.y];
+                                return geo_projection([Number(centroid.lon), Number(centroid.lat)]);
                             }).join("L") + "Z";
                         })
                         .transition()
