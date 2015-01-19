@@ -1,8 +1,8 @@
 
 (function () {
 
-    var max_width = 960,
-        max_height = 600,
+    var max_width = 2560,
+        max_height = 1600,
         width = max_width,
         height = max_height;
 

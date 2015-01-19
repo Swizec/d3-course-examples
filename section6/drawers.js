@@ -32,7 +32,13 @@ var Resizer = function (svg, width, height, geo_path, geo_projection) {
     };
 
     return function resize_viz() {
-        var _w = window.innerWidth,
+        // var left_margin = [$(".container").css("margin-left"),
+        //                    $(".container").css("padding-left"),
+        //                    $(".row").css("padding-left")
+        //                    ].reduce(function (m, el) {
+        //                        return m+Number(el.replace("px", ""));
+        //                    }, 0),
+        var _w = d3.min([window.innerWidth, $("#graph").width()]),
             _h = window.innerHeight;
         
         if (_w < width) {
