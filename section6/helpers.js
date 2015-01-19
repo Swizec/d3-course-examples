@@ -310,6 +310,8 @@ var make_keyframe = function make_keyframe (ufos_by_season, geo_projection,
             .map(function (pos, i) {
                 return{x: pos[0], 
                        y: pos[1],
+                       lon: ufos[i].lon,
+                       lat: ufos[i].lat,
                        id: [key, i].join('-'),
                        cluster: ufos[i].cluster};
             });

@@ -24,6 +24,11 @@ var Resizer = function (svg, width, height, geo_path, geo_projection) {
         svg.selectAll(".centroid")
             .attr({cx: function (d) { return geo_projection([d.lon, d.lat])[0]; },
                    cy: function (d) { return geo_projection([d.lon, d.lat])[1]; }});
+
+        svg.select("g.points")
+            .selectAll("circle")
+            .attr({cx: function (d) { return geo_projection([d.lon, d.lat])[0]; },
+                   cy: function (d) { return geo_projection([d.lon, d.lat])[1]; }});
     };
 
     return function resize_viz() {
@@ -212,8 +217,8 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                 .enter()
                 .append('circle')
                 .attr({
-                    cx: function (d) { return d.x; },
-                    cy: function (d) { return d.y; },
+                    cx: function (d) { return geo_projection([d.lon, d.lat])[0]; },
+                    cy: function (d) { return geo_projection([d.lon, d.lat])[1]; },
                     r: 2,
                     class: function (d) { return "point centroid-"+d.cluster; },
                     id: function (d) { return 'ufo-'+d.id; }
