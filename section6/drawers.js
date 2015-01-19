@@ -17,9 +17,13 @@ var Resizer = function (svg, width, height, geo_path, geo_projection) {
     var move_datapoints = function () {
         svg.selectAll(".base")
             .attr("transform", function (d) {
-                var pos = geo_projection([d.lat, d.lon]);
+                var pos = geo_projection([d.lon, d.lat]);
                 return pos && "translate("+pos[0]+","+pos[1]+")";
             });
+
+        svg.selectAll(".centroid")
+            .attr({cx: function (d) { return geo_projection([d.lon, d.lat])[0]; },
+                   cy: function (d) { return geo_projection([d.lon, d.lat])[1]; }});
     };
 
     return function resize_viz() {
@@ -128,8 +132,11 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                 .attr("class", "hull_layer");
 
             centroids = centroids.map(function (pos, i) {
+                var geo_pos = geo_projection.invert(pos);
                 return {x: pos[0],
                         y: pos[1],
+                        lon: geo_pos[0],
+                        lat: geo_pos[1],
                         id: i};
             });
             

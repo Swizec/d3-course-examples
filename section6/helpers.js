@@ -156,8 +156,8 @@ var prepare = {
                 var pos = projection([point[0], point[1]]);
                 return pos && {x: pos[0],
                                y: pos[1],
-                               lat: point[0],
-                               lon: point[1]};
+                               lon: point[0],
+                               lat: point[1]};
             })
             , function (d) { return !!d; });
     },
