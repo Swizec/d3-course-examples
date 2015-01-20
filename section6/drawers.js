@@ -7,7 +7,8 @@ var Resizer = function (svg, width, height, geo_path, geo_projection) {
 
     // densities per 1000px^2
     var max_base_density = 0.3,
-        max_centroid_density = 0.5;
+        max_centroid_density = 0.5,
+        max_point_density = 10;
 
     var resize_map = function () {
         svg.select(".states")
@@ -19,49 +20,81 @@ var Resizer = function (svg, width, height, geo_path, geo_projection) {
     };
 
     var move_datapoints = function () {
-        var base_density = svg.selectAll(".base").size()/(width*height/1000),
-            base_percent_shown = 1,
-            centroid_density = svg.selectAll(".centroid").size()/(width*height/1000),
-            centroid_percent_shown = 1;
-
-        if (base_density > max_base_density) {
-            base_percent_shown = max_base_density/base_density;
+        function move_bases () {
+            var density = svg.selectAll(".base").size()/(width*height/1000),
+            percent_shown = 1;
+            
+            if (density > max_base_density) {
+                percent_shown = max_base_density/density;
+            }
+            
+            svg.selectAll(".base")
+                .attr("transform", function (d, i) {
+                    var _i = i % Math.round(10-percent_shown*10);
+                    
+                    if (_i == 0 || isNaN(_i)) {
+                        var pos = geo_projection([d.lon, d.lat]);
+                        return pos && "translate("+pos[0]+","+pos[1]+")";
+                    }else{
+                        return "translate(-100, -100)";
+                    }
+                });
         }
 
-        if (centroid_density > max_centroid_density) {
-            centroid_percent_shown = max_centroid_density/centroid_density;
+        function move_centroids () {
+            var density = svg.selectAll(".centroid").size()/(width*height/1000),
+                percent_shown = 1;
+            
+            if (density > max_centroid_density) {
+                percent_shown = max_centroid_density/density;
+            }
+
+
+            svg.selectAll(".centroid")
+                .each(function (d, i) {
+                    var pos = geo_projection([d.lon, d.lat]),
+                        _i = i % Math.round(10-percent_shown*10);
+
+                    if (_i > 0 && !isNaN(_i)) {
+                        pos = [-100, -100];
+                    }
+
+                    d3.select(this)              
+                        .attr({cx: pos[0],
+                               cy: pos[1]});
+                });
+
         }
 
-        svg.selectAll(".base")
-            .attr("transform", function (d, i) {
-                var _i = i%Math.round(10-base_percent_shown*10);
+        function move_points () {
+            var N = svg.select("g.points").selectAll("circle").size(),
+                density = N/(width*height/1000),
+                percent_shown = 1;
 
-                if (_i == 0 || isNaN(_i)) {
-                    var pos = geo_projection([d.lon, d.lat]);
-                    return pos && "translate("+pos[0]+","+pos[1]+")";
-                }else{
-                    return "translate(-100, -100)";
-                }
-            });
+            if (density > max_point_density) {
+                percent_shown = max_point_density/density;
+            }
 
-        svg.selectAll(".centroid")
-            .each(function (d, i) {
-                var pos = geo_projection([d.lon, d.lat]),
-                    _i = i%Math.round(10-centroid_percent_shown*10);
 
-                if (_i > 0 && !isNaN(_i)) {
-                    pos = [-100, -100];
-                }
+            svg.select("g.points")
+                .selectAll("circle")
+                .each(function (d, i) {
+                    var pos = geo_projection([d.lon, d.lat]),
+                        _i = i % Math.round(10-percent_shown*10);
 
-                d3.select(this)              
-                    .attr({cx: pos[0],
-                           cy: pos[1]});
-            });
+                    if (_i > 0 && !isNaN(_i)) {
+                        pos = [-100, -100];
+                    }
 
-        svg.select("g.points")
-            .selectAll("circle")
-            .attr({cx: function (d) { return geo_projection([d.lon, d.lat])[0]; },
-                   cy: function (d) { return geo_projection([d.lon, d.lat])[1]; }});
+                    d3.select(this)
+                        .attr({cx: pos[0],
+                               cy: pos[1]});
+                });
+        }
+
+        move_bases();
+        move_centroids();
+        move_points();
     };
 
     return function resize_viz() {
