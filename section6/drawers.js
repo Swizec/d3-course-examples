@@ -160,38 +160,44 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                     class: "centroid",
                     id: function (d) { return "centroid-"+d.id; }
                 })
-                .on("mouseover", function (d) {
-                    var centroid = d,
-                        vertices = svg
-                            .selectAll(".point.centroid-"+centroid.id)
-                            .data()
-                            .map(function (d) {
-                                return geo_projection([Number(d.lon), Number(d.lat)]);
-                            })
-                            .filter(function (pos) { return !!pos; }),
-                        hull = d3.geom.hull(vertices);
-                    
-                    if (!hull.length) return;
+                .on("mouseover", show_hull)
+                .on("mouseout", hide_hull)
+                .on("touchstart", show_hull)
+                .on("touchend", hide_hull);
 
-                    svg.select("g.hull_layer")
-                        .append("path")
-                        .attr("class", "hull")
-                        .datum(hull)
-                        .attr("d", function (d) {
-                            return "M"+d.map(function () { 
-                                return geo_projection([Number(centroid.lon), Number(centroid.lat)]);
-                            }).join("L") + "Z";
+            function show_hull(d) {
+                var centroid = d,
+                    vertices = svg
+                        .selectAll(".point.centroid-"+centroid.id)
+                        .data()
+                        .map(function (d) {
+                            return geo_projection([Number(d.lon), Number(d.lat)]);
                         })
-                        .transition()
-                        .duration(300)
-                        .attr("d", function (d) {
-                            return "M" + d.join("L") + "Z";
-                        });
-                })
-                .on("mouseout", function (d) {
-                    svg.select(".hull")
-                        .remove();
-                });
+                        .filter(function (pos) { return !!pos; }),
+                    hull = d3.geom.hull(vertices);
+                
+                if (!hull.length) return;
+
+                svg.select("g.hull_layer")
+                    .append("path")
+                    .attr("class", "hull")
+                    .datum(hull)
+                    .attr("d", function (d) {
+                        return "M"+d.map(function () { 
+                            return geo_projection([Number(centroid.lon), Number(centroid.lat)]);
+                        }).join("L") + "Z";
+                    })
+                    .transition()
+                    .duration(300)
+                    .attr("d", function (d) {
+                        return "M" + d.join("L") + "Z";
+                    });
+            }
+
+            function hide_hull(d) {
+                svg.select(".hull")
+                    .remove();
+            }
         },
 
         draw_keyframe: function (keyframe) {
