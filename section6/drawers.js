@@ -5,6 +5,10 @@ var Resizer = function (svg, width, height, geo_path, geo_projection) {
         max_width = width,
         max_height = height;
 
+    // densities per 1000px^2
+    var max_base_density = 0.3,
+        max_centroid_density = 0.5;
+
     var resize_map = function () {
         svg.select(".states")
             .selectAll("path")
@@ -15,15 +19,44 @@ var Resizer = function (svg, width, height, geo_path, geo_projection) {
     };
 
     var move_datapoints = function () {
+        var base_density = svg.selectAll(".base").size()/(width*height/1000),
+            base_percent_shown = 1,
+            centroid_density = svg.selectAll(".centroid").size()/(width*height/1000),
+            centroid_percent_shown = 1;
+
+        if (base_density > max_base_density) {
+            base_percent_shown = max_base_density/base_density;
+        }
+
+        if (centroid_density > max_centroid_density) {
+            centroid_percent_shown = max_centroid_density/centroid_density;
+        }
+
         svg.selectAll(".base")
-            .attr("transform", function (d) {
-                var pos = geo_projection([d.lon, d.lat]);
-                return pos && "translate("+pos[0]+","+pos[1]+")";
+            .attr("transform", function (d, i) {
+                var _i = i%Math.round(10-base_percent_shown*10);
+
+                if (_i == 0 || isNaN(_i)) {
+                    var pos = geo_projection([d.lon, d.lat]);
+                    return pos && "translate("+pos[0]+","+pos[1]+")";
+                }else{
+                    return "translate(-100, -100)";
+                }
             });
 
         svg.selectAll(".centroid")
-            .attr({cx: function (d) { return geo_projection([d.lon, d.lat])[0]; },
-                   cy: function (d) { return geo_projection([d.lon, d.lat])[1]; }});
+            .each(function (d, i) {
+                var pos = geo_projection([d.lon, d.lat]),
+                    _i = i%Math.round(10-centroid_percent_shown*10);
+
+                if (_i > 0 && !isNaN(_i)) {
+                    pos = [-100, -100];
+                }
+
+                d3.select(this)              
+                    .attr({cx: pos[0],
+                           cy: pos[1]});
+            });
 
         svg.select("g.points")
             .selectAll("circle")

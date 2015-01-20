@@ -26,8 +26,7 @@
         .await(function (err, US, states_hash, populations, city_populations, military_bases, _ufos) {
             var resize_viz = Resizer(svg, width, height, geo_path, geo_projection);
             window.onresize = resize_viz;
-            resize_viz();
-            
+                        
             _ufos = prepare.filter_ufos(_ufos, geo_projection);
             var ufos = prepare.ufos(_ufos);
             populations = prepare.populations(populations);
@@ -55,6 +54,8 @@
                  clustered: clustered,
                  populations: cluster_populations}
             );
+
+            resize_viz();
 
             var animation = Animation(keyframes, drawers);
             animation.play_forward();
