@@ -1,0 +1,10 @@
+
+.label {
+    font-size: 1.2em;
+}
+
+.tick {
+    stroke: black;
+    stroke-width: 2;
+    shape-rendering: crispEdges;
+}

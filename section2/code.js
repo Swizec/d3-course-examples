@@ -4,7 +4,7 @@
     var svg = d3.select("#graph")
             .append("svg")
             .style({width: "100%",
-                    height: 500});
+                    height: 600});
 
     var parse_times = function (data) {
         return data.map(function (d) {
@@ -19,9 +19,11 @@
     };
 
     var using_layout = function (data, x, y) {
-        var colors = d3.scale.category20c(),
-            //pie = d3.layout.pie()
-            //    .value(function (d) { return d.value; }),
+        var gradient = d3.scale.linear()
+                .range(['#00001f', '#bf4a07', '#4686dd', '#85c1f5',
+                        '#4686dd', '#ca3a22', '#00001f'])
+                .domain([3/24, 5/24, 8/24, 12/24, 18/24, 20/24, 22/24].map(
+                    d3.interpolate(0, data.length))),
             arc = d3.svg.arc(),
             slice = svg.selectAll('.slice')
                 .data(data)
@@ -31,36 +33,47 @@
 
         slice.append("path")
             .attr({d: arc,
-                   fill: function (d, i) { return colors(i); }
+                   fill: function (d, i) { return gradient(i); }
                   });
+
+        slice.append("text")
+            .text(function (d, i) { console.log(d); return d.value; })
+            .classed("label", true)
+            .attr({
+                transform: function (d, i) {
+                    var angle = 180/Math.PI*(d.startAngle+(d.endAngle-d.startAngle)/2);
+                    return "rotate("+(-90+angle)+") translate("+(d.innerRadius-30)+") rotate(90)";
+                },
+                "text-anchor": "middle"
+            });
+
+        slice.append("line")
+            .classed("tick", true)
+            .attr({
+                x0: 0,
+                y0: 0,
+                x1: 10,
+                y1: 0,
+                transform: function (d, i) {
+                    var angle = 180/Math.PI*(d.startAngle+(d.endAngle-d.startAngle)/2);
+                    return "rotate("+(-90+angle)+") translate("+(d.innerRadius-12)+")"; 
+                }
+            });
     };
 
     d3.json("triangle-ufos.json", function (data) {
         data = parse_times(data);
         
-        var histogram = d3.layout.histogram()
+        var histogram = d3.layout.angle_histogram()
                 .value(function (d) {
                     return d.time.getHours();
                 })
-                .bins(24);
-        
-        var binned = histogram(data);
+                .bins(24)
+                .innerRadius(150)
+                .maxHeight(d3.scale.log().range([0, 200]))
+                .minHeight(function (min_val) { return min_val/2; });
 
-        var radians = d3.scale.linear()
-                .domain([0, d3.max(binned.map(function (d) { return d.x; }))])
-                .range([0, 2*Math.PI]),
-            innerRadius = 20;
-
-        binned = binned.map(function (d) {
-            d.innerRadius = innerRadius;
-            d.outerRadius = d.innerRadius+d.y;
-            d.startAngle = radians(d.x)-radians(d.dx/2);
-            d.endAngle = radians(d.x)+radians(d.dx/2);
-
-            return d;
-        });
-
-        using_layout(binned, 300, 200);
+        using_layout(histogram(data), 400, 400);
     });
 
 })();
