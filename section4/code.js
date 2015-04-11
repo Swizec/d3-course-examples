@@ -14,66 +14,27 @@
             .attr("width", width)
             .attr("height", height);
 
-    var stateIdMap = d3.map({
-        1: "AL",
-        2: "AK",
-        4: "AZ",
-        5: "AR",
-        6: "CA",
-        8: "CO",
-        9: "CT",
-        10: "DE",
-        11: "DC",
-        12: "FL",
-        13: "GA",
-        15: "HI",
-        16: "ID",
-        17: "IL",
-        18: "IN",
-        19: "IA",
-        20: "KS",
-        21: "KY",
-        22: "LA",
-        23: "ME",
-        24: "MD",
-        25: "MA",
-        26: "MI",
-        27: "MN",
-        28: "MS",
-        29: "MO",
-        30: "MT",
-        31: "NE",
-        32: "NV",
-        33: "NH",
-        34: "NJ",
-        35: "NM",
-        36: "NY",
-        37: "NC",
-        38: "ND",
-        39: "OH",
-        40: "OK",
-        41: "OR",
-        42: "PA",
-        44: "RI",
-        45: "SC",
-        46: "SD",
-        47: "TN",
-        48: "TX",
-        49: "UT",
-        50: "VT",
-        51: "VA",
-        53: "WA",
-        54: "WV",
-        55: "WI",
-        56: "WY"
-    });
-
     queue()
-        .defer(d3.json, "us.json")
-        .defer(d3.csv, "full-data.csv")
-        .await(function (err, US, ufos) {
-            ufos = _.groupBy(ufos.filter(function (ufo) { return !!ufo.state; }),
-                             function (ufo) { return ufo.state; });
+        .defer(d3.json, "data/us.json")
+        .defer(d3.json, "data/states-hash.json")
+        .defer(d3.csv, "data/state-populations.csv")
+        .defer(d3.csv, "data/full-data-geodata.csv")
+        .await(function (err, US, states_hash, populations, _ufos) {
+            _ufos = prepare.filter_ufos(_ufos);
+            var ufos = prepare.ufos(_ufos);
+            populations = prepare.populations(populations);
+            states = prepare.states(states_hash);
+
+            var ufoCounts = _.mapValues(ufos, function (ufos, state) {
+                return ufos.length/populations.get(states.get(state))[2010];
+            });
+
+            var quantize = d3.scale.quantize()
+                    .domain(d3.extent(_.values(ufoCounts)))
+                    .range(d3.range(9).map(function (i) {
+                        return "q"+i+"-9-green";
+                    }));
+
 
             var states = svg.append("g")
                     .attr("class", "states")
@@ -83,10 +44,9 @@
 
             states.append("path")
                 .attr("d", path)
-                .on("click", function (d) {
-                    console.log(d, d.id, path.centroid(d));
+                .attr("class", function (d) {
+                    return quantize(ufoCounts[stateIdMap.get(d.id)]);
                 });
-
             
             svg.append("path")
                 .datum(topojson.mesh(US, US.objects.states, 
@@ -94,11 +54,20 @@
                 .attr("class", "borders")
                 .attr("d", path);
 
-            states.append("text")
-                .text(function (d) { return stateIdMap.get(d.id) || d.id; })
+            var positions = _ufos
+                    .map(function (d) { return projection([d.lon, d.lat]); })
+                    .filter(function (d) { return !!d; });
+
+            svg.append("g")
+                .selectAll("circle")
+                .data(positions)
+                .enter()
+                .append("circle")
                 .attr({
-                    x: function (d) { return path.centroid(d)[0] || 0; },
-                    y: function (d) { return path.centroid(d)[1] || 0; }
+                    cx: function (d) { return d[0]; },
+                    cy: function (d) { return d[1]; },
+                    r: 1,
+                    class: "point"
                 });
         });
 
