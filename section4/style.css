@@ -1,13 +1,13 @@
 
+.states {
+    fill: lightblue;
+}
+
 .borders {
     fill: none;
     stroke: white;
     stroke-linejoin: round;
     stroke-width: 1px;
-}
-
-.states {
-    fill: lightblue;
 }
 
 text {
