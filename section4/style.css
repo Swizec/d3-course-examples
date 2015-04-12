@@ -15,9 +15,10 @@ text {
 }
 
 .point {
-    stroke: grey;
+    stroke: lightgrey;
     stroke-width: 1px;
-    fill: white;
+    fill: #ffbe73;
+    fill-opacity: .8;
 }
 
 .q0-9-green { fill:rgb(247,252,245); }

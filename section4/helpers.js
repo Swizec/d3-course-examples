@@ -54,11 +54,14 @@ var stateIdMap = d3.map({
     knownStates = _.sortBy(stateIdMap.values());
 
 var prepare = {
-    filter_ufos: function (ufos) {
+    filter_ufos: function (ufos, projection) {
         return ufos
             .filter(function (ufo) { return !!ufo.state; })
             .filter(function (ufo) {
                 return _.indexOf(knownStates, ufo.state, true) >= 0;
+            })
+            .filter(function (ufo) {
+                return !!projection([ufo.lon, ufo.lat]);
             });
     },
 
@@ -83,5 +86,44 @@ var prepare = {
                                    }));
             })
         ));
+    },
+
+    cluster_populations: function (clustered, city_populations) {
+        return _.mapValues(clustered, function (cluster) {
+            var populations = cluster.map(function (d) {
+                return {city: d.label.toLowerCase(),
+                        population: city_populations[d.label.toLowerCase()] || 0};
+            });
+
+            return _.uniq(populations, function (d) { return d.city; })
+                .reduce(function (sum, d) {
+                    return sum+Number(d.population);
+                }, 0);
+        });
+
+        
     }
+};
+
+var clustered_ufos = function (ufos, projection) {
+    var labels = [],
+        vectors = [];
+
+    ufos
+        .map(function (d) { return {
+            label: [d.city, d.state].join(", "),
+            vector: projection([d.lon, d.lat]) };
+                          })
+        .forEach(function (d) {
+            labels.push(d.label);
+            vectors.push(d.vector);
+        });
+
+    var clusters = figue.kmeans(120, vectors);
+    var clustered = _.groupBy(clusters.assignments.map(function (cluster, i) {
+        return {label: labels[i],
+                cluster: cluster};
+    }), "cluster");
+
+    return [clustered, clusters];
 };

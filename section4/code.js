@@ -18,9 +18,10 @@
         .defer(d3.json, "data/us.json")
         .defer(d3.json, "data/states-hash.json")
         .defer(d3.csv, "data/state-populations.csv")
+        .defer(d3.json, "data/city-populations.json")
         .defer(d3.csv, "data/full-data-geodata.csv")
-        .await(function (err, US, states_hash, populations, _ufos) {
-            _ufos = prepare.filter_ufos(_ufos);
+        .await(function (err, US, states_hash, populations, city_populations, _ufos) {
+            _ufos = prepare.filter_ufos(_ufos, projection);
             var ufos = prepare.ufos(_ufos);
             populations = prepare.populations(populations);
             states = prepare.states(states_hash);
@@ -58,15 +59,35 @@
                     .map(function (d) { return projection([d.lon, d.lat]); })
                     .filter(function (d) { return !!d; });
 
+            var tmp = clustered_ufos(_ufos, projection),
+                clustered = tmp[0],
+                clusters = tmp[1],
+                cluster_populations = prepare.cluster_populations(clustered, city_populations);
+
+            var
+                ratios = _.mapValues(clustered,
+                                     function (group, key) {
+                                         var population = cluster_populations[key];
+                                         console.log(population);
+                                         if (population == 0) {
+                                             return 0;
+                                         }
+
+                                         return group.length/population;
+                                     }),
+            R = d3.scale.linear()
+                .domain([0, d3.max(_.values(ratios))])
+                .range([2, 20]);
+
             svg.append("g")
                 .selectAll("circle")
-                .data(positions)
+                .data(clusters.centroids)
                 .enter()
                 .append("circle")
                 .attr({
                     cx: function (d) { return d[0]; },
                     cy: function (d) { return d[1]; },
-                    r: 1,
+                    r: function (d, i) { return R(ratios[i]); },
                     class: "point"
                 });
         });
