@@ -9,8 +9,8 @@
             .attr("width", width)
             .attr("height", height);
 
-    var projection = d3.geo.albersUsa()
-            .scale(1280)
+    var projection = d3.geo.equirectangular()
+            .scale(150)
             .translate([width/2, height/2]),
         path = d3.geo.path()
             .projection(projection);
