@@ -39,6 +39,43 @@
             drawers.bases(military_bases, geo_projection);
             drawers.centroids(clusters.centroids, clustered, cluster_populations);
 
+            var ufos_by_season = prepare.ufos_by_season(_ufos, 
+                                                        clusters.assignments),
+                seasons = d3.scale.ordinal()
+                    .domain(d3.range(4))
+                    .range(["winter", "spring", "summer", "autumn"]);
+
+            var stepper = setInterval((function () {
+                var step = 0,
+                    year = 1945;
+                return function () {
+                    year = timeline_step(step++, year);
+                };
+            })(), 1000);
+
+            function timeline_step (step, year) {
+                var season = seasons(step%12);
+
+                d3.select("h1.season")
+                    .html([season, year].join(" "));
+
+                requestAnimationFrame(function () {
+                    drawers.place_ufos(ufos_by_season[
+                        [year, season].join("-")
+                    ]);
+                });
+
+                if (step%4 == 3) {
+                    year += 1;
+                }
+
+                if (year > 2014) {
+                    clearInterval(stepper);
+                }
+
+                return year;
+            }
+
         });
 
 })();

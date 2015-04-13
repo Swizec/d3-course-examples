@@ -21,6 +21,13 @@ text {
     fill-opacity: .8;
 }
 
+.centroid {
+    stroke: lightgrey;
+    stroke-width: 1px;
+    fill: #d13636;
+    fill-opacity: .8;
+}
+
 .base {
     fill: white;
     stroke: #5667cc;
