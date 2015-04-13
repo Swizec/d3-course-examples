@@ -100,8 +100,27 @@ var prepare = {
                     return sum+Number(d.population);
                 }, 0);
         });
+    },
 
-        
+    base_positions: function (military_bases, projection) {
+        return _.map(
+            military_bases.getElementsByTagName("Placemark"), function (d) {
+                var point = _.find(d.children, 
+                                   function (node) { 
+                                       return node.nodeName == "Point"; 
+                                   }).textContent.split(",");
+
+                var icon = _.find(d.children,
+                                  function (node) {
+                                      return node.nodeName == "Style";
+                                  });
+                if (icon.innerHTML.indexOf("force-icons.png") < 1
+                    && icon.innerHTML.indexOf("navy-icons.png") < 1) {
+                    return null;
+                }                    
+                return projection([Number(point[0]), Number(point[1])]);
+            })
+            .filter(function (d) { return !!d; });
     }
 };
 

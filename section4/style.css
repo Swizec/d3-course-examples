@@ -21,6 +21,13 @@ text {
     fill-opacity: .8;
 }
 
+.base {
+    fill: white;
+    stroke: #5667cc;
+    stroke-width: 1px;
+    opacity: .9;
+}
+
 .q0-9-green { fill:rgb(247,252,245); }
 .q1-9-green { fill:rgb(229,245,224); }
 .q2-9-green { fill:rgb(199,233,192); }
