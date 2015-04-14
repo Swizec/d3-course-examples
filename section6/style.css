@@ -1,0 +1,63 @@
+
+.borders {
+    fill: none;
+    stroke: white;
+    stroke-linejoin: round;
+    stroke-width: 1px;
+}
+
+.states {
+    fill: lightblue;
+}
+
+text {
+    stroke: black;
+}
+
+.point {
+    stroke: lightgrey;
+    stroke-width: 1px;
+    fill: #ffbe73;
+    fill-opacity: .8;
+}
+
+.centroid {
+    stroke: lightgrey;
+    stroke-width: 1px;
+    fill: #d13636;
+    fill-opacity: .8;
+}
+
+.base {
+    fill: white;
+    stroke: #5667cc;
+    stroke-width: 1px;
+    opacity: .9;
+}
+
+.season {
+    text-align: center;
+    margin-top: 0;
+    cursor: ew-resize;
+}
+
+.controls {
+    margin-top: 20px;
+}
+
+.icon-flipped {
+    transform: scaleX(-1);
+    -moz-transform: scaleX(-1);
+    -webkit-transform: scaleX(-1);
+    -ms-transform: scaleX(-1);
+}
+
+.q0-9-green { fill:rgb(247,252,245); }
+.q1-9-green { fill:rgb(229,245,224); }
+.q2-9-green { fill:rgb(199,233,192); }
+.q3-9-green { fill:rgb(161,217,155); }
+.q4-9-green { fill:rgb(116,196,118); }
+.q5-9-green { fill:rgb(65,171,93); }
+.q6-9-green { fill:rgb(35,139,69); }
+.q7-9-green { fill:rgb(0,109,44); }
+.q8-9-green { fill:rgb(0,68,27); }

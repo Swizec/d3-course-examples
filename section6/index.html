@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<title></title>
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+<link rel="stylesheet" href="style.css">
+
+<div class="container">
+    <div class="row">
+        <div id="graph"></div>
+    </div>
+
+    <div class="row controls">
+        <div class="col-md-2 col-md-offset-1 left">
+            <button class="btn btn-primary btn-lg glyphicon glyphicon-chevron-left" id="down"></button>
+
+            <button class="btn btn-primary btn-lg glyphicon glyphicon-play icon-flipped" id="play_backward"></button>
+
+            <button class="btn btn-primary btn-lg glyphicon glyphicon-backward hidden speedUp"></button>
+
+            <button class="btn btn-primary btn-lg glyphicon glyphicon-pause pause hidden" id="pause"></button>
+        </div>
+
+        <div class="col-md-3">
+            <h1 class="season"></h1>
+        </div>
+
+        <div class="col-md-3 right">
+            <button class="btn btn-primary btn-lg glyphicon glyphicon-pause pause hidden" id="pause"></button>
+
+            <button class="btn btn-primary btn-lg glyphicon glyphicon-play" id="play_forward"></button>
+
+            <button class="btn btn-primary btn-lg glyphicon glyphicon-forward hidden speedUp"></button>
+
+            <button class="btn btn-primary btn-lg glyphicon glyphicon-chevron-right" id="up"></button>
+        </div>
+    </div>
+</div>
+
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://d3js.org/queue.v1.min.js"></script>
+<script src="http://d3js.org/topojson.v1.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.js"></script>
+<script src="libs/figue.js"></script>
+<script src="helpers.js"></script>
+<script src="drawers.js"></script>
+<script src="code.js"></script>
