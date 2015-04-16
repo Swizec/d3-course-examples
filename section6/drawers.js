@@ -53,6 +53,9 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                 .attr("class", "points")
                 .datum({type: "points"});
 
+            svg.append("g")
+                .attr("class", "hull_layer");
+
             centroids = centroids.map(function (pos, i) {
                 return {x: pos[0],
                         y: pos[1],
@@ -73,6 +76,37 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                     r: 0,
                     class: "centroid",
                     id: function (d, i) { return "centroid-"+d.id; }
+                })
+                .on("mouseover", function (d) {
+                    var centroid = d,
+                        vertices = svg
+                            .selectAll(".point.centroid-"+centroid.id)
+                            .data()
+                            .map(function (d) {
+                                return [d.x, d.y];
+                            }),
+                        hull = d3.geom.hull(vertices);
+
+                    if (!hull.length) return;
+
+                    svg.select("g.hull_layer")
+                        .append("path")
+                        .attr("class", "hull")
+                        .datum(hull)
+                        .attr("d", function (d) {
+                            return "M"+d.map(function () {
+                                return [centroid.x, centroid.y];
+                            }).join("L") + "Z";
+                        })
+                        .transition()
+                        .duration(300)
+                        .attr("d", function (d) {
+                            return "M" + d.join("L") + "Z";
+                        });
+                })
+                .on("mouseout", function (d) {
+                    svg.select(".hull")
+                        .remove();
                 });
         },
 
@@ -103,7 +137,7 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                     cx: function (d) { return d.x; },
                     cy: function (d) { return d.y; },
                     r: 2,
-                    class: "point",
+                    class: function (d) { return "point centroid-"+d.cluster; },
                     id: function (d) { return "ufo-"+d.id; }
                 })
                 .transition()

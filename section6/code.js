@@ -216,4 +216,5 @@
 
         });
 
+    $("[data-toggle=tooltip]").tooltip()
 })();

@@ -52,6 +52,14 @@ text {
     -ms-transform: scaleX(-1);
 }
 
+.hull {
+    stroke: white;
+    stroke-width: 1px;
+    stroke-linejoin: round;
+    fill: #2d97e3;
+    fill-opacity: .6;
+}
+
 .q0-9-green { fill:rgb(247,252,245); }
 .q1-9-green { fill:rgb(229,245,224); }
 .q2-9-green { fill:rgb(199,233,192); }
