@@ -117,8 +117,14 @@ var prepare = {
                 if (icon.innerHTML.indexOf("force-icons.png") < 1
                     && icon.innerHTML.indexOf("navy-icons.png") < 1) {
                     return null;
-                }                    
-                return projection([Number(point[0]), Number(point[1])]);
+                }
+
+                var pos = projection([Number(point[0]), Number(point[1])]);
+                return pos && {x: pos[0],
+                               y: pos[1],
+                               lon: point[0],
+                               lat: point[1]
+                };
             })
             .filter(function (d) { return !!d; });
     },
@@ -301,6 +307,8 @@ var make_keyframe = function make_keyframe (ufos_by_season, geo_projection,
             .map(function (pos, i) {
                 return {x: pos[0],
                         y: pos[1],
+                        lon: ufos[i].lon,
+                        lat: ufos[i].lat,
                         id: [key, i].join("-"),
                         cluster: ufos[i].cluster};
             });

@@ -1,4 +1,149 @@
 
+var Resizer = function (svg, width, height, geo_path, geo_projection) {
+    var size_ratio = width/height,
+        max_width = width,
+        max_height = height;
+
+    // densities per 1000px^2
+    var max_base_density = 0.3,
+        max_centroid_density = 0.5,
+        max_point_density = 10;
+
+    var resize_map = function () {
+        svg.select(".states")
+            .selectAll("path")
+            .attr("d", geo_path);
+
+        svg.selectAll(".borders")
+            .attr("d", geo_path);
+    };
+
+    var move_datapoints = function () {
+        function move_bases () {
+            var density = svg.selectAll(".base").size()/(width*height/1000),
+                percent_shown = 1;
+
+            if (density > max_base_density) {
+                percent_shown = max_base_density/density;
+            }
+
+            svg.selectAll(".base")
+                .attr("transform", function (d, i) {
+                    var _i = i % Math.round(10-percent_shown*10);
+
+                    if (_i == 0 || isNaN(_i)) {
+                        var pos = geo_projection([d.lon, d.lat]);
+                        return pos && "translate("+pos[0]+","+pos[1]+")";
+                    }else{
+                        return "translate(-100, -100)";
+                    }
+                });
+        }
+
+        function move_centroids () {
+            var density = svg.selectAll(".centroid").size()/(width*height/1000),
+                percent_shown = 1;
+
+            if (density > max_centroid_density) {
+                percent_shown = max_centroid_density/density;
+            }
+
+            svg.selectAll(".centroid")
+                .each(function (d, i) {
+                    var pos = geo_projection([d.lon, d.lat]),
+                        _i = i % Math.round(10-percent_shown*10);
+                                                                
+                    if (_i > 0 && !isNaN(_i)) {
+                        pos = [-100, -100];
+                    }
+                        
+                    d3.select(this)
+                        .attr({cx: pos[0],
+                               cy: pos[1]});
+                });
+        }
+
+        function move_points () {
+            var N = svg.select("g.points").selectAll("circle").size(),
+                density = N/(width*height/1000),
+                percent_shown = 1;
+
+            if (density > max_centroid_density) {
+                percent_shown = max_centroid_density/density;
+            }
+
+            svg.select("g.points")
+                .selectAll("circle")
+                .each(function (d, i) {
+                    var pos = geo_projection([d.lon, d.lat]),
+                        _i = i % Math.round(10-percent_shown*10);
+                                                                
+                    if (_i > 0 && !isNaN(_i)) {
+                        pos = [-100, -100];
+                    }
+                        
+                    d3.select(this)
+                        .attr({cx: pos[0],
+                               cy: pos[1]});
+                });
+        }
+
+        move_bases();
+        move_centroids();
+        move_points();
+    };
+
+    return function resize_viz() {
+        var _w = d3.min([window.innerWidth, $("#graph").width()]),
+            _h = window.innerHeight;
+
+        if (_w < width) {
+            width = _w;
+            height = width/size_ratio;
+        }else if (_h < height) {
+            height = _h;
+            width = height*size_ratio;
+        }
+
+        if (_w > width) {
+            width = _w;
+            height = width/size_ratio;
+
+            if (_h < height) {
+                height = _h;
+                width = height*size_ratio;
+            }
+        }else if (_h > height) {
+            height = _h;
+            width = height*size_ratio;
+
+            if (_w < width) {
+                width = _w;
+                height = width/size_ratio;
+            }
+        }
+
+        if (width > max_width) {
+            width = max_width;
+            height = width/size_ratio;
+        }
+        if (height > max_height) {
+            height = max_height;
+            width = height*size_ratio;
+        }
+
+        svg.attr("width", width)
+            .attr("height", height);
+
+        geo_projection
+            .scale(width)
+            .translate([width / 2, height / 2]);
+
+        resize_map();
+        move_datapoints();
+    };
+};
+
 var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
     return {
         map: function (US, geo_path, states) {
@@ -57,8 +202,11 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                 .attr("class", "hull_layer");
 
             centroids = centroids.map(function (pos, i) {
+                var geo_pos = geo_projection.invert(pos);
                 return {x: pos[0],
                         y: pos[1],
+                        lon: Number(geo_pos[0]),
+                        lat: Number(geo_pos[1]),
                         id: i};
             });
 
@@ -83,7 +231,8 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                             .selectAll(".point.centroid-"+centroid.id)
                             .data()
                             .map(function (d) {
-                                return [d.x, d.y];
+                                return geo_projection([Number(d.lon),
+                                                       Number(d.lat)]);
                             }),
                         hull = d3.geom.hull(vertices);
 
@@ -95,7 +244,9 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                         .datum(hull)
                         .attr("d", function (d) {
                             return "M"+d.map(function () {
-                                return [centroid.x, centroid.y];
+                                return geo_projection(
+                                    [Number(centroid.lon), Number(centroid.lat)]
+                                );
                             }).join("L") + "Z";
                         })
                         .transition()
@@ -134,8 +285,12 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
                 .enter()
                 .append("circle")
                 .attr({
-                    cx: function (d) { return d.x; },
-                    cy: function (d) { return d.y; },
+                    cx: function (d) { 
+                        return geo_projection([d.lon, d.lat])[0]; 
+                    },
+                    cy: function (d) { 
+                        return geo_projection([d.lon, d.lat])[1]; 
+                    },
                     r: 2,
                     class: function (d) { return "point centroid-"+d.cluster; },
                     id: function (d) { return "ufo-"+d.id; }
