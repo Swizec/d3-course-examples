@@ -1,5 +1,5 @@
 
-function Animation(keyframes, ) {
+function Animation(keyframes, drawers) {
     var player,
         playing = false,
         speed = 1,
