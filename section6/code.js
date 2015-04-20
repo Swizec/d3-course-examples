@@ -26,7 +26,7 @@
             var resize_viz = Resizer(svg, width, height, geo_path, geo_projection);
             window.onresize = resize_viz;
 
-            _ufos = prepare.filter_ufos(_ufos, geo_projection);
+            _ufos = prepare.filter_ufos(_ufos);
             var ufos = prepare.ufos(_ufos);
             populations = prepare.populations(populations);
             var states = prepare.states(states_hash);
