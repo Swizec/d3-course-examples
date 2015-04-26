@@ -280,7 +280,10 @@ var Drawers = function (svg, ufos, populations, geo_path, geo_projection) {
 
             svg.select("g.points")
                 .selectAll("circle")
-                .data(keyframe.ufos['+'],
+                .data(keyframe.ufos['+']
+                      .filter(function (d) { 
+                          return !!geo_projection([d.lon, d.lat]);
+                      }),
                       function (d) { return d.id; })
                 .enter()
                 .append("circle")

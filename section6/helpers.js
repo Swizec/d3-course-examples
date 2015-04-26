@@ -54,11 +54,14 @@ var stateIdMap = d3.map({
     knownStates = _.sortBy(stateIdMap.values());
 
 var prepare = {
-    filter_ufos: function (ufos) {
+    filter_ufos: function (ufos, projection) {
         return ufos
             .filter(function (ufo) { return !!ufo.state; })
             .filter(function (ufo) {
                 return _.indexOf(knownStates, ufo.state, true) >= 0;
+            })
+            .filter(function (ufo) {
+                return !!projection([ufo.lon, ufo.lat]);
             });
     },
 
@@ -228,7 +231,6 @@ var clustered_ufos = function (ufos, projection) {
             label: [d.city, d.state].join(", "),
             vector: projection([d.lon, d.lat]) };
                           })
-        .filter(function (d) { return !!d.vector; })
         .forEach(function (d) {
             labels.push(d.label);
             vectors.push(d.vector);
@@ -302,7 +304,6 @@ var make_keyframe = function make_keyframe (ufos_by_season, geo_projection,
             .map(function (ufo) {
                 return geo_projection([Number(ufo.lon), Number(ufo.lat)]);
             })
-            .filter(function (pos) { return !!pos; })
             .map(function (pos, i) {
                 return {x: pos[0],
                         y: pos[1],
